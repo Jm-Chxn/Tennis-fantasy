@@ -19,21 +19,26 @@ public class DataInitializer {
     @Bean
     public ApplicationRunner initializeData() {
         return args -> {
-            System.out.println("🚀 Auto-importing test data to Supabase...");
+            System.out.println("🚀 Auto-import: Loading initial player data...");
             
-            List<Player> testPlayers = Arrays.asList(
+            List<Player> initialPlayers = Arrays.asList(
                 new Player("Novak", "Djokovic", "Serbia", 1, new BigDecimal("15.50")),
                 new Player("Carlos", "Alcaraz", "Spain", 2, new BigDecimal("14.75")),
                 new Player("Daniil", "Medvedev", "Russia", 3, new BigDecimal("13.25")),
                 new Player("Jannik", "Sinner", "Italy", 4, new BigDecimal("12.80")),
                 new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")),
-                new Player("Roger", "Dai", "China", 500, new BigDecimal("2.00"))
+                new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")), // DUPLICATE 1
+                new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")), // DUPLICATE 2
+                new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")), // DUPLICATE 3
+                new Player("Roger", "Dai", "China", 500, new BigDecimal("2.00")),
+                new Player("dandan", "hu", "china", 499, new BigDecimal("3")),
+                new Player("ivan", "luo", "china", 498, new BigDecimal("3.5"))
             );
 
-            supabaseService.createPlayers(testPlayers)
+            supabaseService.createPlayersIfNotExists(initialPlayers)
                     .subscribe(
-                        players -> System.out.println("✅ Successfully auto-imported " + players.size() + " players to Supabase!"),
-                        error -> System.out.println("❌ Failed to auto-import players: " + error.getMessage())
+                        result -> System.out.println("✅ Auto-import completed: " + result),
+                        error -> System.out.println("❌ Auto-import failed: " + error.getMessage())
                     );
         };
     }

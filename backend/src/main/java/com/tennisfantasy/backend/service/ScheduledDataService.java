@@ -27,12 +27,13 @@ public class ScheduledDataService {
             new Player("Daniil", "Medvedev", "Russia", 3, new BigDecimal("13.25")),
             new Player("Jannik", "Sinner", "Italy", 4, new BigDecimal("12.80")),
             new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")),
-            new Player("Roger", "Dai", "China", 500, new BigDecimal("2.00"))
+            new Player("Roger", "Dai", "China", 500, new BigDecimal("2.00")),
+            new Player("dandan", "hu", "china", 499, new BigDecimal("3"))
         );
 
-        supabaseService.createPlayers(currentPlayers)
+        supabaseService.createPlayersIfNotExists(currentPlayers)
                 .subscribe(
-                    players -> System.out.println("✅ Scheduled sync completed: " + players.size() + " players updated"),
+                    result -> System.out.println("✅ Scheduled sync completed: " + result),
                     error -> System.out.println("❌ Scheduled sync failed: " + error.getMessage())
                 );
     }

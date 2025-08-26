@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -24,29 +25,97 @@ public class SupabaseService {
         this.objectMapper.setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE);
     }
     
-    // Create a new player in Supabase
-    public Mono<Player> createPlayer(Player player) {
-        try {
-            // Remove the ID field for insert (Supabase auto-generates it)
-            Player playerForInsert = new Player();
-            playerForInsert.setFirstName(player.getFirstName());
-            playerForInsert.setLastName(player.getLastName());
-            playerForInsert.setCountry(player.getCountry());
-            playerForInsert.setRank(player.getRank());
-            playerForInsert.setCost(player.getCost());
-            
-            String playerJson = objectMapper.writeValueAsString(playerForInsert);
-            return supabaseWebClient.post()
-                    .uri("/players")
-                    .header("Prefer", "return=representation")
-                    .bodyValue(playerJson)
-                    .retrieve()
-                    .bodyToMono(Player.class);
-        } catch (JsonProcessingException e) {
-            return Mono.error(new RuntimeException("Error serializing player data", e));
-        }
+    // Check if a player already exists in Supabase
+    public Mono<Boolean> playerExists(String firstName, String lastName) {
+        String filter = "first_name.eq." + firstName + ",last_name.eq." + lastName;
+        
+        return supabaseWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                    .path("/players")
+                    .queryParam("select", "id")
+                    .queryParam("and", "(" + filter + ")")
+                    .build())
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(response -> {
+                    System.out.println("Checking if player exists: " + firstName + " " + lastName + " - Response: " + response);
+                    // If response is empty array "[]", player doesn't exist
+                    return !response.trim().equals("[]");
+                })
+                .onErrorReturn(false);
     }
-    
+
+    // Get all existing players from Supabase
+    public Mono<List<Player>> getAllPlayers() {
+        return supabaseWebClient.get()
+                .uri("/players")
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(json -> {
+                    try {
+                        return objectMapper.readValue(json, 
+                            objectMapper.getTypeFactory().constructCollectionType(List.class, Player.class));
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("Error deserializing players", e);
+                    }
+                });
+    }
+
+    // Create players only if they don't already exist
+    public Mono<String> createPlayersIfNotExists(List<Player> players) {
+        return getAllPlayers()
+                .flatMap(existingPlayers -> {
+                    List<Player> newPlayers = new ArrayList<>();
+                    List<String> skippedPlayers = new ArrayList<>();
+                    
+                    for (Player player : players) {
+                        boolean exists = existingPlayers.stream()
+                                .anyMatch(existing -> 
+                                    existing.getFirstName().equalsIgnoreCase(player.getFirstName()) &&
+                                    existing.getLastName().equalsIgnoreCase(player.getLastName()));
+                        
+                        if (exists) {
+                            skippedPlayers.add(player.getFirstName() + " " + player.getLastName());
+                        } else {
+                            newPlayers.add(player);
+                        }
+                    }
+                    
+                    System.out.println("📊 Summary:");
+                    System.out.println("   - New players to add: " + newPlayers.size());
+                    System.out.println("   - Existing players skipped: " + skippedPlayers.size());
+                    if (!skippedPlayers.isEmpty()) {
+                        System.out.println("   - Skipped: " + String.join(", ", skippedPlayers));
+                    }
+                    
+                    if (newPlayers.isEmpty()) {
+                        return Mono.just("No new players to add - all players already exist in Supabase!");
+                    }
+                    
+                    return createPlayers(newPlayers)
+                            .map(savedPlayers -> {
+                                String result = "✅ Added " + savedPlayers.size() + " new players";
+                                if (!skippedPlayers.isEmpty()) {
+                                    result += ", skipped " + skippedPlayers.size() + " existing players";
+                                }
+                                return result;
+                            });
+                })
+                .onErrorReturn("❌ Failed to check existing players");
+    }
+
+    // Delete all players from Supabase (for testing)
+    public Mono<String> deleteAllPlayers() {
+        return supabaseWebClient.delete()
+                .uri("/players?id=gte.1")  // Delete all players where id >= 1
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnNext(response -> System.out.println("🗑️ Deleted all players from Supabase"))
+                .doOnError(error -> System.out.println("❌ Failed to delete players: " + error.getMessage()))
+                .map(response -> "✅ Successfully deleted all players from Supabase")
+                .onErrorReturn("❌ Failed to delete all players");
+    }
+
     // Create a single player in Supabase
     public Mono<Player> createPlayer(Player player) {
         try {
@@ -98,22 +167,6 @@ public class SupabaseService {
         } catch (JsonProcessingException e) {
             return Mono.error(new RuntimeException("Error serializing players data", e));
         }
-    }
-    
-    // Get all players from Supabase
-    public Mono<List<Player>> getAllPlayers() {
-        return supabaseWebClient.get()
-                .uri("/players?select=*")
-                .retrieve()
-                .bodyToMono(String.class)
-                .map(json -> {
-                    try {
-                        return objectMapper.readValue(json, 
-                            objectMapper.getTypeFactory().constructCollectionType(List.class, Player.class));
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException("Error deserializing players", e);
-                    }
-                });
     }
     
     // Get player by ID from Supabase
