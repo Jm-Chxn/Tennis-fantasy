@@ -2,10 +2,14 @@ package com.tennisfantasy.backend.controller;
 
 import com.tennisfantasy.backend.model.Player;
 import com.tennisfantasy.backend.service.PlayerService;
+import com.tennisfantasy.backend.service.SportsRadarService;
+import com.tennisfantasy.backend.service.SupabaseService;
+import reactor.core.publisher.Flux;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +18,26 @@ import java.util.Optional;
 @RequestMapping("/players")
 @CrossOrigin(origins = "http://localhost:3000")
 public class PlayerController {
+        @Autowired
+        private SportsRadarService sportsRadarService;
+
+        @Autowired
+        private SupabaseService supabaseService;
+
+        // Import players from SportsRadar and post to Supabase
+        @PostMapping("/import-from-sportradar")
+        public Mono<ResponseEntity<String>> importPlayersFromSportsRadar() {
+                return sportsRadarService.fetchPlayers()
+                        .flatMapMany(Flux::fromIterable)
+                        .flatMap(supabaseService::createPlayer)
+                        .collectList()
+                        .map(players -> ResponseEntity.ok("Imported " + players.size() + " players"))
+                        .onErrorResume(e -> {
+                                e.printStackTrace();
+                                return Mono.just(ResponseEntity.internalServerError()
+                                        .body("Failed to import players: " + e.getMessage()));
+                        });
+        }
     
     private final PlayerService playerService;
     
@@ -22,110 +46,130 @@ public class PlayerController {
         this.playerService = playerService;
     }
     
+    // Test Supabase connection
+    @GetMapping("/test-connection")
+    public Mono<ResponseEntity<String>> testSupabaseConnection() {
+        return playerService.testSupabaseConnection()
+                .map(result -> ResponseEntity.ok("Supabase connection test: " + result))
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to test Supabase connection"));
+    }
+    
     // Get all players
     @GetMapping
-    public ResponseEntity<List<Player>> getAllPlayers() {
-        List<Player> players = playerService.getAllPlayers();
-        return ResponseEntity.ok(players);
+    public Mono<ResponseEntity<List<Player>>> getAllPlayers() {
+        return playerService.getAllPlayers()
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Get player by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Player> getPlayerById(@PathVariable Long id) {
-        Optional<Player> player = playerService.getPlayerById(id);
-        return player.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Mono<ResponseEntity<Player>> getPlayerById(@PathVariable Long id) {
+        return playerService.getPlayerById(id)
+                .map(playerOpt -> playerOpt.map(ResponseEntity::ok)
+                        .orElse(ResponseEntity.notFound().build()))
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Create new player
     @PostMapping
-    public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
-        Player createdPlayer = playerService.createPlayer(player);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPlayer);
+    public Mono<ResponseEntity<Player>> createPlayer(@RequestBody Player player) {
+        return playerService.createPlayer(player)
+                .map(createdPlayer -> ResponseEntity.status(HttpStatus.CREATED).body(createdPlayer))
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Update existing player
     @PutMapping("/{id}")
-    public ResponseEntity<Player> updatePlayer(@PathVariable Long id, @RequestBody Player playerDetails) {
-        try {
-            Player updatedPlayer = playerService.updatePlayer(id, playerDetails);
-            return ResponseEntity.ok(updatedPlayer);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public Mono<ResponseEntity<Player>> updatePlayer(@PathVariable Long id, @RequestBody Player playerDetails) {
+        return playerService.updatePlayer(id, playerDetails)
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.notFound().build());
     }
     
     // Delete player
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
-        playerService.deletePlayer(id);
-        return ResponseEntity.noContent().build();
+    public Mono<ResponseEntity<Void>> deletePlayer(@PathVariable Long id) {
+        return playerService.deletePlayer(id)
+                .then(Mono.just(ResponseEntity.noContent().<Void>build()))
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Get players by country
     @GetMapping("/country/{country}")
-    public ResponseEntity<List<Player>> getPlayersByCountry(@PathVariable String country) {
-        List<Player> players = playerService.getPlayersByCountry(country);
-        return ResponseEntity.ok(players);
+    public Mono<ResponseEntity<List<Player>>> getPlayersByCountry(@PathVariable String country) {
+        return playerService.getPlayersByCountry(country)
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Get players by position
     @GetMapping("/position/{position}")
-    public ResponseEntity<List<Player>> getPlayersByPosition(@PathVariable String position) {
-        List<Player> players = playerService.getPlayersByPosition(position);
-        return ResponseEntity.ok(players);
+    public Mono<ResponseEntity<List<Player>>> getPlayersByPosition(@PathVariable String position) {
+        return playerService.getPlayersByPosition(position)
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Get active players
     @GetMapping("/active")
-    public ResponseEntity<List<Player>> getActivePlayers() {
-        List<Player> players = playerService.getActivePlayers();
-        return ResponseEntity.ok(players);
+    public Mono<ResponseEntity<List<Player>>> getActivePlayers() {
+        return playerService.getActivePlayers()
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Get players by ranking range
     @GetMapping("/ranking")
-    public ResponseEntity<List<Player>> getPlayersByRankingRange(
+    public Mono<ResponseEntity<List<Player>>> getPlayersByRankingRange(
             @RequestParam Integer minRanking,
             @RequestParam Integer maxRanking) {
-        List<Player> players = playerService.getPlayersByRankingRange(minRanking, maxRanking);
-        return ResponseEntity.ok(players);
+        return playerService.getPlayersByRankingRange(minRanking, maxRanking)
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Search players by name
     @GetMapping("/search")
-    public ResponseEntity<List<Player>> searchPlayersByName(@RequestParam String name) {
-        List<Player> players = playerService.searchPlayersByName(name);
-        return ResponseEntity.ok(players);
+    public Mono<ResponseEntity<List<Player>>> searchPlayersByName(@RequestParam String name) {
+        return playerService.searchPlayersByName(name)
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Get top ranked players
     @GetMapping("/top-ranked")
-    public ResponseEntity<List<Player>> getTopRankedPlayers() {
-        List<Player> players = playerService.getTopRankedPlayers();
-        return ResponseEntity.ok(players);
+    public Mono<ResponseEntity<List<Player>>> getTopRankedPlayers() {
+        return playerService.getTopRankedPlayers()
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Get players by price range
     @GetMapping("/price-range")
-    public ResponseEntity<List<Player>> getPlayersByPriceRange(
+    public Mono<ResponseEntity<List<Player>>> getPlayersByPriceRange(
             @RequestParam Double minPrice,
             @RequestParam Double maxPrice) {
-        List<Player> players = playerService.getPlayersByPriceRange(minPrice, maxPrice);
-        return ResponseEntity.ok(players);
+        return playerService.getPlayersByPriceRange(minPrice, maxPrice)
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Get player count by country
     @GetMapping("/count/country/{country}")
-    public ResponseEntity<Long> getPlayerCountByCountry(@PathVariable String country) {
-        long count = playerService.getPlayerCountByCountry(country);
-        return ResponseEntity.ok(count);
+    public Mono<ResponseEntity<Long>> getPlayerCountByCountry(@PathVariable String country) {
+        return playerService.getPlayerCountByCountry(country)
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
     
     // Initialize sample data
     @PostMapping("/init-sample-data")
-    public ResponseEntity<String> initializeSampleData() {
-        playerService.initializeSampleData();
-        return ResponseEntity.ok("Sample data initialized successfully");
+    public Mono<ResponseEntity<String>> initializeSampleData() {
+        return playerService.initializeSampleData()
+                .map(ResponseEntity::ok)
+                .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to initialize sample data"));
     }
 }

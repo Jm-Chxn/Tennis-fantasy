@@ -1,10 +1,15 @@
+
 package com.tennisfantasy.backend.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(name = "players")
 public class Player {
@@ -15,30 +20,38 @@ public class Player {
     
     @NotBlank
     @Column(name = "first_name")
+    @JsonProperty("first_name")
     private String firstName;
     
     @NotBlank
     @Column(name = "last_name")
+    @JsonProperty("last_name")
     private String lastName;
     
     @NotBlank
     @Column(name = "country")
+    @JsonProperty("country")
     private String country;
     
     @NotNull
     @Column(name = "ranking")
+    @JsonProperty("ranking")
     private Integer ranking;
     
     @Column(name = "points")
+    @JsonProperty("points")
     private Integer points;
     
     @Column(name = "price", precision = 10, scale = 2)
+    @JsonProperty("price")
     private BigDecimal price;
     
     @Column(name = "position")
+    @JsonProperty("position")
     private String position; // e.g., "Singles", "Doubles"
     
     @Column(name = "is_active")
+    @JsonProperty("is_active")
     private Boolean isActive = true;
     
     // Default constructor

@@ -1,9 +1,10 @@
 package com.tennisfantasy.backend.service;
 
 import com.tennisfantasy.backend.model.Player;
-import com.tennisfantasy.backend.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -12,129 +13,116 @@ import java.util.Optional;
 @Service
 public class PlayerService {
     
-    private final PlayerRepository playerRepository;
+    private final SupabaseService supabaseService;
     
     @Autowired
-    public PlayerService(PlayerRepository playerRepository) {
-        this.playerRepository = playerRepository;
+    public PlayerService(SupabaseService supabaseService) {
+        this.supabaseService = supabaseService;
     }
     
     // Get all players
-    public List<Player> getAllPlayers() {
-        return playerRepository.findAll();
+    public Mono<List<Player>> getAllPlayers() {
+        return supabaseService.getAllPlayers();
     }
     
     // Get player by ID
-    public Optional<Player> getPlayerById(Long id) {
-        return playerRepository.findById(id);
+    public Mono<Optional<Player>> getPlayerById(Long id) {
+        return supabaseService.getPlayerById(id);
     }
     
     // Create new player
-    public Player createPlayer(Player player) {
-        return playerRepository.save(player);
+    public Mono<Player> createPlayer(Player player) {
+        return supabaseService.createPlayer(player);
     }
     
     // Update existing player
-    public Player updatePlayer(Long id, Player playerDetails) {
-        Optional<Player> playerOptional = playerRepository.findById(id);
-        if (playerOptional.isPresent()) {
-            Player player = playerOptional.get();
-            player.setFirstName(playerDetails.getFirstName());
-            player.setLastName(playerDetails.getLastName());
-            player.setCountry(playerDetails.getCountry());
-            player.setRanking(playerDetails.getRanking());
-            player.setPoints(playerDetails.getPoints());
-            player.setPrice(playerDetails.getPrice());
-            player.setPosition(playerDetails.getPosition());
-            player.setIsActive(playerDetails.getIsActive());
-            return playerRepository.save(player);
-        }
-        throw new RuntimeException("Player not found with id: " + id);
+    public Mono<Player> updatePlayer(Long id, Player playerDetails) {
+        return supabaseService.updatePlayer(id, playerDetails);
     }
     
     // Delete player
-    public void deletePlayer(Long id) {
-        playerRepository.deleteById(id);
+    public Mono<Void> deletePlayer(Long id) {
+        return supabaseService.deletePlayer(id);
     }
     
     // Get players by country
-    public List<Player> getPlayersByCountry(String country) {
-        return playerRepository.findByCountry(country);
+    public Mono<List<Player>> getPlayersByCountry(String country) {
+        return supabaseService.getPlayersByCountry(country);
     }
     
-    // Get players by position
-    public List<Player> getPlayersByPosition(String position) {
-        return playerRepository.findByPosition(position);
+    // Get players by position (placeholder - implement in SupabaseService if needed)
+    public Mono<List<Player>> getPlayersByPosition(String position) {
+        // This would need to be implemented in SupabaseService
+        return Mono.just(List.of());
     }
     
-    // Get active players
-    public List<Player> getActivePlayers() {
-        return playerRepository.findByIsActiveTrue();
+    // Get active players (placeholder - implement in SupabaseService if needed)
+    public Mono<List<Player>> getActivePlayers() {
+        // This would need to be implemented in SupabaseService
+        return Mono.just(List.of());
     }
     
-    // Get players by ranking range
-    public List<Player> getPlayersByRankingRange(Integer minRanking, Integer maxRanking) {
-        return playerRepository.findByRankingBetween(minRanking, maxRanking);
+    // Get players by ranking range (placeholder - implement in SupabaseService if needed)
+    public Mono<List<Player>> getPlayersByRankingRange(Integer minRanking, Integer maxRanking) {
+        // This would need to be implemented in SupabaseService
+        return Mono.just(List.of());
     }
     
-    // Search players by name
-    public List<Player> searchPlayersByName(String name) {
-        return playerRepository.findByNameContainingIgnoreCase(name);
+    // Search players by name (placeholder - implement in SupabaseService if needed)
+    public Mono<List<Player>> searchPlayersByName(String name) {
+        // This would need to be implemented in SupabaseService
+        return Mono.just(List.of());
     }
     
-    // Get top ranked players
-    public List<Player> getTopRankedPlayers() {
-        return playerRepository.findTopRankedPlayers();
+    // Get top ranked players (placeholder - implement in SupabaseService if needed)
+    public Mono<List<Player>> getTopRankedPlayers() {
+        // This would need to be implemented in SupabaseService
+        return Mono.just(List.of());
     }
     
-    // Get players by price range
-    public List<Player> getPlayersByPriceRange(Double minPrice, Double maxPrice) {
-        return playerRepository.findByPriceRange(minPrice, maxPrice);
+    // Get players by price range (placeholder - implement in SupabaseService if needed)
+    public Mono<List<Player>> getPlayersByPriceRange(Double minPrice, Double maxPrice) {
+        // This would need to be implemented in SupabaseService
+        return Mono.just(List.of());
     }
     
-    // Get player count by country
-    public long getPlayerCountByCountry(String country) {
-        return playerRepository.countByCountry(country);
+    // Get player count by country (placeholder - implement in SupabaseService if needed)
+    public Mono<Long> getPlayerCountByCountry(String country) {
+        // This would need to be implemented in SupabaseService
+        return Mono.just(0L);
     }
     
-    // Find player by full name
-    public Optional<Player> findPlayerByFullName(String firstName, String lastName) {
-        return playerRepository.findByFirstNameAndLastName(firstName, lastName);
+    // Find player by full name (placeholder - implement in SupabaseService if needed)
+    public Mono<Optional<Player>> findPlayerByFullName(String firstName, String lastName) {
+        // This would need to be implemented in SupabaseService
+        return Mono.just(Optional.empty());
     }
     
     // Initialize with sample data
-    public void initializeSampleData() {
-        if (playerRepository.count() == 0) {
-            // Add some sample tennis players
-            Player player1 = new Player("Novak", "Djokovic", "Serbia", 1);
-            player1.setPoints(12000);
-            player1.setPrice(new BigDecimal("15.50"));
-            player1.setPosition("Singles");
-            playerRepository.save(player1);
-            
-            Player player2 = new Player("Carlos", "Alcaraz", "Spain", 2);
-            player2.setPoints(11000);
-            player2.setPrice(new BigDecimal("14.75"));
-            player2.setPosition("Singles");
-            playerRepository.save(player2);
-            
-            Player player3 = new Player("Daniil", "Medvedev", "Russia", 3);
-            player3.setPoints(10000);
-            player3.setPrice(new BigDecimal("13.25"));
-            player3.setPosition("Singles");
-            playerRepository.save(player3);
-            
-            Player player4 = new Player("Iga", "Swiatek", "Poland", 1);
-            player4.setPoints(11500);
-            player4.setPrice(new BigDecimal("16.00"));
-            player4.setPosition("Singles");
-            playerRepository.save(player4);
-            
-            Player player5 = new Player("Aryna", "Sabalenka", "Belarus", 2);
-            player5.setPoints(10500);
-            player5.setPrice(new BigDecimal("15.25"));
-            player5.setPosition("Singles");
-            playerRepository.save(player5);
-        }
+    public Mono<String> initializeSampleData() {
+        return Flux.just(
+            createSamplePlayer("Novak", "Djokovic", "Serbia", 1, 12000, "15.50", "Singles"),
+            createSamplePlayer("Carlos", "Alcaraz", "Spain", 2, 11000, "14.75", "Singles"),
+            createSamplePlayer("Daniil", "Medvedev", "Russia", 3, 10000, "13.25", "Singles"),
+            createSamplePlayer("Iga", "Swiatek", "Poland", 1, 11500, "16.00", "Singles"),
+            createSamplePlayer("Aryna", "Sabalenka", "Belarus", 2, 10500, "15.25", "Singles")
+        )
+        .flatMap(player -> supabaseService.createPlayer(player))
+        .collectList()
+        .map(players -> "Sample data initialized successfully with " + players.size() + " players");
+    }
+    
+    private Player createSamplePlayer(String firstName, String lastName, String country, 
+                                   Integer ranking, Integer points, String price, String position) {
+        Player player = new Player(firstName, lastName, country, ranking);
+        player.setPoints(points);
+        player.setPrice(new BigDecimal(price));
+        player.setPosition(position);
+        return player;
+    }
+    
+    // Test Supabase connection
+    public Mono<String> testSupabaseConnection() {
+        return supabaseService.testConnection();
     }
 }
