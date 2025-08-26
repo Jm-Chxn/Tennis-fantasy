@@ -27,14 +27,76 @@ public class SupabaseService {
     // Create a new player in Supabase
     public Mono<Player> createPlayer(Player player) {
         try {
-            String playerJson = objectMapper.writeValueAsString(player);
+            // Remove the ID field for insert (Supabase auto-generates it)
+            Player playerForInsert = new Player();
+            playerForInsert.setFirstName(player.getFirstName());
+            playerForInsert.setLastName(player.getLastName());
+            playerForInsert.setCountry(player.getCountry());
+            playerForInsert.setRank(player.getRank());
+            playerForInsert.setCost(player.getCost());
+            
+            String playerJson = objectMapper.writeValueAsString(playerForInsert);
             return supabaseWebClient.post()
                     .uri("/players")
+                    .header("Prefer", "return=representation")
                     .bodyValue(playerJson)
                     .retrieve()
                     .bodyToMono(Player.class);
         } catch (JsonProcessingException e) {
             return Mono.error(new RuntimeException("Error serializing player data", e));
+        }
+    }
+    
+    // Create a single player in Supabase
+    public Mono<Player> createPlayer(Player player) {
+        try {
+            String playerJson = objectMapper.writeValueAsString(player);
+            System.out.println("Sending single player JSON to Supabase: " + playerJson);
+            
+            return supabaseWebClient.post()
+                    .uri("/players")
+                    .header("Prefer", "return=representation")
+                    .bodyValue(playerJson)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .doOnNext(response -> System.out.println("Supabase single player response: " + response))
+                    .doOnError(error -> System.out.println("Supabase single player error: " + error.getMessage()))
+                    .map(json -> {
+                        try {
+                            return objectMapper.readValue(json, Player.class);
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException("Error deserializing player", e);
+                        }
+                    });
+        } catch (JsonProcessingException e) {
+            return Mono.error(new RuntimeException("Error serializing player data", e));
+        }
+    }
+
+    // Bulk create players in Supabase
+    public Mono<List<Player>> createPlayers(List<Player> players) {
+        try {
+            String playersJson = objectMapper.writeValueAsString(players);
+            System.out.println("Sending JSON to Supabase: " + playersJson);
+            
+            return supabaseWebClient.post()
+                    .uri("/players")
+                    .header("Prefer", "return=representation")
+                    .bodyValue(playersJson)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .doOnNext(response -> System.out.println("Supabase response: " + response))
+                    .doOnError(error -> System.out.println("Supabase error: " + error.getMessage()))
+                    .map(json -> {
+                        try {
+                            return objectMapper.readValue(json, 
+                                objectMapper.getTypeFactory().constructCollectionType(List.class, Player.class));
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException("Error deserializing players", e);
+                        }
+                    });
+        } catch (JsonProcessingException e) {
+            return Mono.error(new RuntimeException("Error serializing players data", e));
         }
     }
     

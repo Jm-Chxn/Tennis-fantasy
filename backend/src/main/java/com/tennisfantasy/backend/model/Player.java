@@ -2,7 +2,7 @@
 package com.tennisfantasy.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +16,7 @@ public class Player {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
     
     @NotBlank
@@ -34,35 +35,24 @@ public class Player {
     private String country;
     
     @NotNull
-    @Column(name = "ranking")
-    @JsonProperty("ranking")
-    private Integer ranking;
+    @Column(name = "rank")
+    @JsonProperty("rank")
+    private Integer rank;
     
-    @Column(name = "points")
-    @JsonProperty("points")
-    private Integer points;
-    
-    @Column(name = "price", precision = 10, scale = 2)
-    @JsonProperty("price")
-    private BigDecimal price;
-    
-    @Column(name = "position")
-    @JsonProperty("position")
-    private String position; // e.g., "Singles", "Doubles"
-    
-    @Column(name = "is_active")
-    @JsonProperty("is_active")
-    private Boolean isActive = true;
+    @Column(name = "cost", precision = 10, scale = 2)
+    @JsonProperty("cost")
+    private BigDecimal cost;
     
     // Default constructor
     public Player() {}
     
     // Constructor with fields
-    public Player(String firstName, String lastName, String country, Integer ranking) {
+    public Player(String firstName, String lastName, String country, Integer rank, BigDecimal cost) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.country = country;
-        this.ranking = ranking;
+        this.rank = rank;
+        this.cost = cost;
     }
     
     // Getters and Setters
@@ -98,44 +88,20 @@ public class Player {
         this.country = country;
     }
     
-    public Integer getRanking() {
-        return ranking;
+    public Integer getRank() {
+        return rank;
     }
     
-    public void setRanking(Integer ranking) {
-        this.ranking = ranking;
+    public void setRank(Integer rank) {
+        this.rank = rank;
     }
     
-    public Integer getPoints() {
-        return points;
+    public BigDecimal getCost() {
+        return cost;
     }
     
-    public void setPoints(Integer points) {
-        this.points = points;
-    }
-    
-    public BigDecimal getPrice() {
-        return price;
-    }
-    
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-    
-    public String getPosition() {
-        return position;
-    }
-    
-    public void setPosition(String position) {
-        this.position = position;
-    }
-    
-    public Boolean getIsActive() {
-        return isActive;
-    }
-    
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
     }
     
     @Override
@@ -145,11 +111,8 @@ public class Player {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", country='" + country + '\'' +
-                ", ranking=" + ranking +
-                ", points=" + points +
-                ", price=" + price +
-                ", position='" + position + '\'' +
-                ", isActive=" + isActive +
+                ", rank=" + rank +
+                ", cost=" + cost +
                 '}';
     }
 }

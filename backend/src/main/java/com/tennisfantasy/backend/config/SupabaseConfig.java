@@ -14,12 +14,16 @@ public class SupabaseConfig {
     @Value("${supabase.anon.key}")
     private String supabaseAnonKey;
     
+    @Value("${supabase.service.key}")
+    private String supabaseServiceKey;
+    
     @Bean
     public WebClient supabaseWebClient() {
+        // Use service role key for write operations (create, update, delete)
         return WebClient.builder()
                 .baseUrl(supabaseUrl + "/rest/v1")
-                .defaultHeader("apikey", supabaseAnonKey)
-                .defaultHeader("Authorization", "Bearer " + supabaseAnonKey)
+                .defaultHeader("apikey", supabaseServiceKey)
+                .defaultHeader("Authorization", "Bearer " + supabaseServiceKey)
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }
@@ -30,5 +34,9 @@ public class SupabaseConfig {
     
     public String getSupabaseAnonKey() {
         return supabaseAnonKey;
+    }
+    
+    public String getSupabaseServiceKey() {
+        return supabaseServiceKey;
     }
 }
