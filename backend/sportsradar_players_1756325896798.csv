@@ -1,0 +1,501 @@
+Rank,First Name,Last Name,Country,Cost
+1,Jannik,Sinner,Italy,15.00
+2,Carlos,Alcaraz,Spain,15.00
+3,Alexander,Zverev,Germany,15.00
+4,Taylor,Fritz,USA,15.00
+5,Jack,Draper,Great Britain,15.00
+6,Ben,Shelton,USA,12.00
+7,Novak,Djokovic,Serbia,12.00
+8,Alex,de Minaur,Australia,12.00
+9,Karen,Khachanov,Neutral,12.00
+10,Lorenzo,Musetti,Italy,12.00
+11,Holger,Rune,Denmark,10.00
+12,Casper,Ruud,Norway,10.00
+13,Daniil,Medvedev,Neutral,10.00
+14,Tommy,Paul,USA,10.00
+15,Andrey,Rublev,Neutral,10.00
+16,Jakub,Mensik,Czechia,10.00
+17,Frances,Tiafoe,USA,10.00
+18,Alejandro,Davidovich Fokina,Spain,10.00
+19,Francisco,Cerundolo,Argentina,10.00
+20,Arthur,Fils,France,10.00
+21,Jiri,Lehecka,Czechia,7.00
+22,Tomas,Machac,Czechia,7.00
+23,Ugo,Humbert,France,7.00
+24,Alexander,Bublik,Kazakhstan,7.00
+25,Grigor,Dimitrov,Bulgaria,7.00
+26,Flavio,Cobolli,Italy,7.00
+27,Felix,Auger-Aliassime,Canada,7.00
+28,Stefanos,Tsitsipas,Greece,7.00
+29,Denis,Shapovalov,Canada,7.00
+30,Tallon,Griekspoor,Netherlands,7.00
+31,Brandon,Nakashima,USA,7.00
+32,Alex,Michelsen,USA,7.00
+33,Gabriel,Diallo,Canada,7.00
+34,Luciano,Darderi,Italy,7.00
+35,Cameron,Norrie,Great Britain,7.00
+36,Alexei,Popyrin,Australia,7.00
+37,Giovanni,Mpetshi Perricard,France,7.00
+38,Alexandre,Muller,France,7.00
+39,Sebastian,Baez,Argentina,7.00
+40,Corentin,Moutet,France,7.00
+41,Nuno,Borges,Portugal,7.00
+42,Miomir,Kecmanovic,Serbia,7.00
+43,Camilo,Ugo Carabelli,Argentina,7.00
+44,Jaume,Munar,Spain,7.00
+45,Joao,Fonseca,Brazil,7.00
+46,Lorenzo,Sonego,Italy,7.00
+47,Roberto,Bautista Agut,Spain,7.00
+48,Zizou,Bergs,Belgium,7.00
+49,Gael,Monfils,France,7.00
+50,Learner,Tien,USA,7.00
+51,Benjamin,Bonzi,France,5.00
+52,Matteo,Berrettini,Italy,5.00
+53,Fabian,Marozsan,Hungary,5.00
+54,Francisco,Comesana,Argentina,5.00
+55,Marcos,Giron,USA,5.00
+56,Daniel,Altmaier,Germany,5.00
+57,Hamad,Medjedovic,Serbia,5.00
+58,Jordan,Thompson,Australia,5.00
+59,Tomas Martin,Etcheverry,Argentina,5.00
+60,Jacob,Fearnley,Great Britain,5.00
+61,Damir,Dzumhur,Bosnia & Herzegovina,5.00
+62,Marin,Cilic,Croatia,5.00
+63,Marton,Fucsovics,Hungary,5.00
+64,Matteo,Arnaldi,Italy,5.00
+65,Mattia,Bellucci,Italy,5.00
+66,Pedro,Martinez,Spain,5.00
+67,Reilly,Opelka,USA,5.00
+68,Hubert,Hurkacz,Poland,5.00
+69,Terence,Atmane,France,5.00
+70,Quentin,Halys,France,5.00
+71,Aleksandar,Kovacevic,USA,5.00
+72,Laslo,Djere,Serbia,5.00
+73,Botic,Van de Zandschulp,Netherlands,5.00
+74,Yunchaokete,Bu,China,5.00
+75,Sebastian,Korda,USA,5.00
+76,Kamil,Majchrzak,Poland,5.00
+77,Adrian,Mannarino,France,5.00
+78,Mariano,Navone,Argentina,5.00
+79,Arthur,Cazaux,France,5.00
+80,David,Goffin,Belgium,5.00
+81,Christopher,O'Connell,Australia,5.00
+82,Arthur,Rinderknech,France,5.00
+83,Jesper,De Jong,Netherlands,5.00
+84,Ethan,Quinn,USA,5.00
+85,Adam,Walton,Australia,5.00
+86,Luca,Nardi,Italy,5.00
+87,Roberto,Carballes Baena,Spain,5.00
+88,Juan Manuel,Cerundolo,Argentina,5.00
+89,Vit,Kopriva,Czechia,5.00
+90,Kei,Nishikori,Japan,5.00
+91,Alexander,Shevchenko,Kazakhstan,5.00
+92,Jenson,Brooksby,USA,5.00
+93,Filip,Misolic,Austria,5.00
+94,Roman,Safiullin,Neutral,5.00
+95,Aleksandar,Vukic,Australia,5.00
+96,Tristan,Schoolkate,Australia,5.00
+97,Dalibor,Svrcina,Czechia,5.00
+98,Valentin,Royer,France,5.00
+99,Carlos,Taberner,Spain,5.00
+100,Mackenzie,McDonald,USA,5.00
+101,Emilio,Nava,USA,3.50
+102,Nicolas,Jarry,Chile,3.50
+103,Rinky,Hijikata,Australia,3.50
+104,Nishesh,Basavareddy,USA,3.50
+105,Borna,Coric,Croatia,3.50
+106,James,Duckworth,Australia,3.50
+107,Raphael,Collignon,Belgium,3.50
+108,Nikoloz,Basilashvili,Georgia,3.50
+109,Elmer,Moller,Denmark,3.50
+110,Brandon,Holt,USA,3.50
+111,Juncheng,Shang,China,3.50
+112,Shintaro,Mochizuki,Japan,3.50
+113,Tristan,Boyer,USA,3.50
+114,Liam,Draxl,Canada,3.50
+115,Thiago Agustin,Tirante,Argentina,3.50
+116,Alexander,Blockx,Belgium,3.50
+117,Jaime,Faria,Portugal,3.50
+118,Chun Hsin,Tseng,Chinese Taipei,3.50
+119,Lukas,Klein,Slovakia,3.50
+120,Francesco,Passaro,Italy,3.50
+121,Hugo,Dellien,Bolivia,3.50
+122,Alejandro,Tabilo,Chile,3.50
+123,Otto,Virtanen,Finland,3.50
+124,Dino,Prizmic,Croatia,3.50
+125,Hugo,Gaston,France,3.50
+126,Cristian,Garin,Chile,3.50
+127,Eliot,Spizzirri,USA,3.50
+128,Dusan,Lajovic,Serbia,3.50
+129,Juan Pablo,Ficovich,Argentina,3.50
+130,Matteo,Gigante,Italy,3.50
+131,Daniel Elahi,Galan,Colombia,3.50
+132,Yannick,Hanfmann,Germany,3.50
+133,Colton,Smith,USA,3.50
+134,Marcelo Tomas,Barrios Vera,Chile,3.50
+135,Ignacio,Buse,Peru,3.50
+136,Daniel,Evans,Great Britain,3.50
+137,Pablo,Carreno Busta,Spain,3.50
+138,Martin,Landaluce,Spain,3.50
+139,Pierre-Hugues,Herbert,France,3.50
+140,Sebastian,Ofner,Austria,3.50
+141,Andrea,Pellegrino,Italy,3.50
+142,Roman Andres,Burruchaga,Argentina,3.50
+143,Thiago,Seyboth Wild,Brazil,3.50
+144,Jan-Lennard,Struff,Germany,3.50
+145,Zachary,Svajda,USA,3.50
+146,Stan,Wawrinka,Switzerland,3.50
+147,Mark,Lajal,Estonia,3.50
+148,Yosuke,Watanuki,Japan,3.50
+149,Yoshihito,Nishioka,Japan,3.50
+150,Jan,Choinski,Great Britain,3.50
+151,Billy,Harris,Great Britain,3.50
+152,Harold,Mayot,France,3.50
+153,Federico,Coria,Argentina,3.50
+154,Jurij,Rodionov,Austria,3.50
+155,Francesco,Maestrelli,Italy,3.50
+156,Zsombor,Piros,Hungary,3.50
+157,Lukas,Neumayer,Austria,3.50
+158,Nicolai,Budkov Kjaer,Norway,3.50
+159,Titouan,Droguet,France,3.50
+160,Vilius,Gaubas,Lithuania,3.50
+161,Guy,Den Ouden,Netherlands,3.50
+162,Chris,Rodesch,Luxembourg,3.50
+163,Felipe,Meligeni Alves,Brazil,3.50
+164,Kyrian,Jacquet,France,3.50
+165,Moez,Echargui,Tunisia,3.50
+166,Taro,Daniel,Japan,3.50
+167,Henrique,Rocha,Portugal,3.50
+168,Bernard,Tomic,Australia,3.50
+169,Thiago,Monteiro,Brazil,3.50
+170,Daniel,Merida,Spain,3.50
+171,Hady,Habib,Lebanon,3.50
+172,August,Holmgren,Denmark,3.50
+173,Coleman,Wong,Hong Kong, China,3.50
+174,Lucas,Pouille,France,3.50
+175,Jerome,Kym,Switzerland,3.50
+176,James,McCabe,Australia,3.50
+177,Alexis,Galarneau,Canada,3.50
+178,Li,Tu,Australia,3.50
+179,Christopher,Eubanks,USA,3.50
+180,Murphy,Cassone,USA,3.50
+181,Alibek,Kachmazov,Neutral,3.50
+182,Richard,Gasquet,France,3.50
+183,Marco,Trungelliti,Argentina,3.50
+184,Ugo,Blanchet,France,3.50
+185,Calvin,Hemery,France,3.50
+186,Mitchell,Krueger,USA,3.50
+187,James Kent,Trotter,Japan,3.50
+188,Hugo,Grenier,France,3.50
+189,Patrick,Kypson,USA,3.50
+190,Zhizhen,Zhang,China,3.50
+191,Beibit,Zhukayev,Kazakhstan,3.50
+192,Timofey,Skatov,Kazakhstan,3.50
+193,Kimmer,Coppejans,Belgium,3.50
+194,Yu Hsiou,Hsu,Chinese Taipei,3.50
+195,Jason,Kubler,Australia,3.50
+196,Luka,Pavlovic,France,3.50
+197,Rei,Sakamoto,Japan,3.50
+198,Sho,Shimabukuro,Japan,3.50
+199,Constant,Lestienne,France,3.50
+200,Benjamin,Hassan,Lebanon,3.50
+201,Jay,Clarke,Great Britain,2.50
+202,Omar,Jasika,Australia,2.50
+203,Federico Agustin,Gomez,Argentina,2.50
+204,Luca,Van Assche,France,2.50
+205,Gonzalo,Bueno,Peru,2.50
+206,Sascha,Gueymard Wayenburg,France,2.50
+207,Santiago,Rodriguez Taverna,Argentina,2.50
+208,Stefano,Travaglia,Italy,2.50
+209,Borna,Gojo,Croatia,2.50
+210,Federico,Cina,Italy,2.50
+211,Yibing,Wu,China,2.50
+212,Aziz,Dougaz,Tunisia,2.50
+213,Gauthier,Onclin,Belgium,2.50
+214,Nicolas,Moreno de Alboran,USA,2.50
+215,Arthur,Bouquier,France,2.50
+216,Valentin,Vacherot,Monaco,2.50
+217,Vitaliy,Sachko,Ukraine,2.50
+218,Alex,Bolt,Australia,2.50
+219,Rio,Noguchi,Japan,2.50
+220,Justin,Engel,Germany,2.50
+221,Clement,Chidekh,France,2.50
+222,Jack,Pinnington Jones,Great Britain,2.50
+223,Yuta,Shimizu,Japan,2.50
+224,Rodrigo,Pacheco Mendez,Mexico,2.50
+225,Yasutaka,Uchiyama,Japan,2.50
+226,Dominic,Stricker,Switzerland,2.50
+227,Marc-Andrea,Huesler,Switzerland,2.50
+228,Alex,Barrena,Argentina,2.50
+229,Joao Lucas,Reis Da Silva,Brazil,2.50
+230,Oliver,Crawford,Great Britain,2.50
+231,Elias,Ymer,Sweden,2.50
+232,Johannus,Monday,Great Britain,2.50
+233,Nerman,Fatic,Bosnia & Herzegovina,2.50
+234,Mikhail,Kukushkin,Kazakhstan,2.50
+235,Arthur,Fery,Great Britain,2.50
+236,Ilia,Simakin,Neutral,2.50
+237,Dmitry,Popko,Kazakhstan,2.50
+238,Fajing,Sun,China,2.50
+239,Andrea,Collarini,Argentina,2.50
+240,Ryan,Peniston,Great Britain,2.50
+241,Viktor,Durasovic,Norway,2.50
+242,Clement,Tabur,France,2.50
+243,Alvaro,Guillen Meza,Ecuador,2.50
+244,Thanasi,Kokkinakis,Australia,2.50
+245,George,Loffhagen,Great Britain,2.50
+246,Nicolas,Mejia,Colombia,2.50
+247,Arthur,Gea,France,2.50
+248,Matej,Dodig,Croatia,2.50
+249,Edas,Butvilas,Lithuania,2.50
+250,Juan Carlos,Prado Angelo,Bolivia,2.50
+251,Marek,Gengel,Czechia,2.50
+252,Adolfo Daniel,Vallejo,Paraguay,2.50
+253,Pol,Martin Tiffon,Spain,2.50
+254,Aslan,Karatsev,Neutral,2.50
+255,Frederico,Ferreira Silva,Portugal,2.50
+256,Facundo,Diaz Acosta,Argentina,2.50
+257,Alex,Molcan,Slovakia,2.50
+258,Duje,Ajdukovic,Croatia,2.50
+259,Genaro Alberto,Olivieri,Argentina,2.50
+260,Giulio,Zeppieri,Italy,2.50
+261,Norbert,Gombos,Slovakia,2.50
+262,Joel,Schwaerzler,Austria,2.50
+263,Dimitar,Kuzmanov,Bulgaria,2.50
+264,Lautaro,Midon,Argentina,2.50
+265,Saba,Purtseladze,Georgia,2.50
+266,Dan,Added,France,2.50
+267,Filip Cristian,Jianu,Romania,2.50
+268,Marat,Sharipov,Neutral,2.50
+269,Murkel,Dellien,Bolivia,2.50
+270,Patrick,Zahraj,Germany,2.50
+271,Matteo,Martineau,France,2.50
+272,Matias,Soto,Chile,2.50
+273,Ivan,Gakhov,Neutral,2.50
+274,Christoph,Negritu,Germany,2.50
+275,Tung-Lin,Wu,Chinese Taipei,2.50
+276,Geoffrey,Blancaneaux,France,2.50
+277,Daniel,Michalski,Poland,2.50
+278,Zdenek,Kolar,Czechia,2.50
+279,Marco,Cecchinato,Italy,2.50
+280,Andres,Martin,USA,2.50
+281,Matheus,Pucinelli de Almeida,Brazil,2.50
+282,Nicolas,Alvarez Varona,Spain,2.50
+283,Mathys,Erhard,France,2.50
+284,Alexander,Ritschard,Switzerland,2.50
+285,Marko,ToPo,Germany,2.50
+286,Tiago,Pereira,Portugal,2.50
+287,Daniel,Rincon,Spain,2.50
+288,Jakub,Paul,Switzerland,2.50
+289,Jie,Cui,China,2.50
+290,Albert,Ramos-Vinolas,Spain,2.50
+291,Nikolas,Sanchez Izquierdo,Spain,2.50
+292,Hynek,Barton,Czechia,2.50
+293,Sumit,Nagal,India,2.50
+294,Pavel,Kotov,Neutral,2.50
+295,Carlos,Sanchez Jover,Spain,2.50
+296,Lorenzo,Giustino,Italy,2.50
+297,Robin,Bertrand,France,2.50
+298,Yan (1989),Bai,China,2.50
+299,Adria,Soriano Barrera,Colombia,2.50
+300,Alejandro,Moro Canas,Spain,2.50
+301,Eliakim,Coulibaly,Cote d’Ivoire,2.00
+302,Aidan,Mayo,USA,2.00
+303,Nicolas,Kicker,Argentina,2.00
+304,Mili,Poljicak,Croatia,2.00
+305,Garrett,Johns,USA,2.00
+306,Max Hans,Rehberg,Germany,2.00
+307,Gastao,Elias,Portugal,2.00
+308,Andrea,Vavassori,Italy,2.00
+309,Oleg,Prihodko,Ukraine,2.00
+310,Corentin,Denolly,France,2.00
+311,Michael,Geerts,Belgium,2.00
+312,Florent,Bax,France,2.00
+313,Max,Houkes,Netherlands,2.00
+314,Alex,Rybakov,USA,2.00
+315,Stefanos,Sakellaridis,Greece,2.00
+316,Mika,Brunold,Switzerland,2.00
+317,Denis,Yevseyev,Kazakhstan,2.00
+318,Juan Pablo,Varillas,Peru,2.00
+319,Paul,Jubb,Great Britain,2.00
+320,Antoine,Escoffier,France,2.00
+321,Michael,Zheng,USA,2.00
+322,Petr,Bar Biryukov,Neutral,2.00
+323,Alexey,Vatutin,Neutral,2.00
+324,Patrick,Maloney,USA,2.00
+325,Yi,Zhou,China,2.00
+326,Gijs,Brouwer,Netherlands,2.00
+327,Michael,Mmoh,USA,2.00
+328,Gustavo,Heide,Brazil,2.00
+329,Roberto,Cid Subervi,Dominican Republic,2.00
+330,Moerani,Bouzige,Australia,2.00
+331,Khumoyun,Sultanov,Uzbekistan,2.00
+332,Jelle,Sels,Netherlands,2.00
+333,Pedro,Boscardin Dias,Brazil,2.00
+334,Daniel,Dutra Da Silva,Brazil,2.00
+335,Alastair,Gray,Great Britain,2.00
+336,Karue,Sell,Brazil,2.00
+337,Robert,Strombachs,Germany,2.00
+338,Andres,Andrade,Ecuador,2.00
+339,Diego,Dedura-Palomero,Germany,2.00
+340,Luka,Mikrut,Croatia,2.00
+341,Gilles,Arnaud Bailly,Belgium,2.00
+342,Mats,Rosenkranz,Germany,2.00
+343,Govind,Nanda,USA,2.00
+344,Naoki,Nakagawa,Japan,2.00
+345,Gabriele,Piraino,Italy,2.00
+346,Kasidit,Samrej,Thailand,2.00
+347,Daniil,Glinka,Estonia,2.00
+348,Tyler,Zink,USA,2.00
+349,Alfredo,Perez,USA,2.00
+350,Remy,Bertola,Switzerland,2.00
+351,Abdullah,Shelbayh,Jordan,2.00
+352,Tom,Paris,France,2.00
+353,Lloyd,Harris,South Africa,2.00
+354,Andrej,Martin,Slovakia,2.00
+355,Andrej,Nedic,Bosnia & Herzegovina,2.00
+356,Inaki,Montes-de la Torre,Spain,2.00
+357,Milos,Karol,Slovakia,2.00
+358,Gabi Adrian,Boitan,Romania,2.00
+359,Lucas,Poullain,France,2.00
+360,Christian,Langmo,USA,2.00
+361,Pablo,Llamas Ruiz,Spain,2.00
+362,Rafael,Jodar,Spain,2.00
+363,Gonzalo,Oliveira,Venezuela,2.00
+364,Darwin,Blanch,USA,2.00
+365,Philip,Henning,South Africa,2.00
+366,Andrea,Picchione,Italy,2.00
+367,Maximus,Jones,Thailand,2.00
+368,Franco,Roncadelli,Uruguay,2.00
+369,Federico,Arnaboldi,Italy,2.00
+370,Tom,Gentzsch,Germany,2.00
+371,Jacopo,Berrettini,Italy,2.00
+372,Hiroki,Moriya,Japan,2.00
+373,Gonzalo,Villanueva,Argentina,2.00
+374,Gregoire,Barrere,France,2.00
+375,Blake,Ellis,Australia,2.00
+376,Hyeon,Chung,Republic of Korea,2.00
+377,Raul,Brancaccio,Italy,2.00
+378,Alexandr,Binda,Italy,2.00
+379,Gabriel,Debru,France,2.00
+380,Ricardas,Berankis,Lithuania,2.00
+381,Fabrizio,Andaloro,Italy,2.00
+382,Svyatoslav,Gulin,Neutral,2.00
+383,Guido Ivan,Justo,Argentina,2.00
+384,Henry,Searle,Great Britain,2.00
+385,Oleksandr,Ovcharenko,Ukraine,2.00
+386,Rudolf,Molleker,Germany,2.00
+387,Oliver,Tarvet,Great Britain,2.00
+388,Nicholas David,Ionel,Romania,2.00
+389,Stefan,Dostanic,USA,2.00
+390,Giles,Hussey,Great Britain,2.00
+391,Henri,Squire,Germany,2.00
+392,Laurent,Lokoli,France,2.00
+393,Lilian,Marmousez,France,2.00
+394,Adrian,Andreev,Bulgaria,2.00
+395,Maximilian,Neuchrist,Austria,2.00
+396,Sandro,Kopp,Austria,2.00
+397,Oriol,Roca Batalla,Spain,2.00
+398,Kilian,Feldbausch,Switzerland,2.00
+399,Aryan,Shah,India,2.00
+400,Radu,Albot,Moldova,2.00
+401,Facundo,Mena,Argentina,2.00
+402,Miguel,Damas,Spain,2.00
+403,Franco,Agamenone,Italy,2.00
+404,Andre,Ilagan,USA,2.00
+405,Javier,Barranco Cosano,Spain,2.00
+406,Sanhui,Shin,Republic of Korea,2.00
+407,Giovanni,Fonio,Italy,2.00
+408,Dane,Sweeny,Australia,2.00
+409,Karan (IND),Singh,India,2.00
+410,Bernabe,Zapata Miralles,Spain,2.00
+411,Viacheslav,Bielinskyi,Ukraine,2.00
+412,Renzo,Olivo,Argentina,2.00
+413,Luciano Emanuel,Ambrogi,Argentina,2.00
+414,Olle,Wallin,Sweden,2.00
+415,Lukas,Pokorny,Slovakia,2.00
+416,Federico,Bondioli,Italy,2.00
+417,Dennis,Novak,Austria,2.00
+418,Mariano,Kestelboim,Argentina,2.00
+419,Max,Alcala Gurri,Spain,2.00
+420,Matthew,Dellavedova,Australia,2.00
+421,Masamichi,Imamura,Japan,2.00
+422,Juan Carlos,Aguilar,Canada,2.00
+423,Yusuke,Takahashi,Japan,2.00
+424,Alex,Marti Pujolras,Spain,2.00
+425,Charles,Broom,Great Britain,2.00
+426,Kyle,Edmund,Great Britain,2.00
+427,Maxim,Mrva,Czechia,2.00
+428,Marvin,Moeller,Germany,2.00
+429,Toby Alex,Kodat,USA,2.00
+430,Maks,Kasnikowski,Poland,2.00
+431,Martin,Damm Jr,USA,2.00
+432,Enrico,Dalla Valle,Italy,2.00
+433,Dali,Blanch,USA,2.00
+434,Kris,van Wyk,South Africa,2.00
+435,Leandro,Riedi,Switzerland,2.00
+436,Max,Wiskandt,Germany,2.00
+437,Juan Bautista,Torres,Argentina,2.00
+438,Ryan,Nijboer,Netherlands,2.00
+439,Marc,Polmans,Australia,2.00
+440,Pedro,Sakamoto,Brazil,2.00
+441,Petr,Brunclik,Czechia,2.00
+442,Hamish,Stewart,Great Britain,2.00
+443,David,Jorda Sanchis,Spain,2.00
+444,Tibo,Colson,Belgium,2.00
+445,Stuart,Parker,Great Britain,2.00
+446,Maximilian,Marterer,Germany,2.00
+447,Cedrik-Marcel,Stebe,Germany,2.00
+448,Jakub,Nicod,Czechia,2.00
+449,Iliyan,Radulov,Bulgaria,2.00
+450,Stefan,Kozlov,USA,2.00
+451,Hernan,Casanova,Argentina,2.00
+452,Oleksii,Krutykh,Ukraine,2.00
+453,Lorenzo Joaquin,Rodriguez,Argentina,2.00
+454,Daniel,Milavsky,USA,2.00
+455,Gerard,Campana Lee,Republic of Korea,2.00
+456,Dan,Martin,Canada,2.00
+457,Antoine,Ghibaudo,France,2.00
+458,Renta,Tokuda,Japan,2.00
+459,Jake,Delaney,Australia,2.00
+460,Dominik,Koepfer,Germany,2.00
+461,Alex,Hernandez,Mexico,2.00
+462,Facundo,Bagnis,Argentina,2.00
+463,Aristotelis,Thanos,Greece,2.00
+464,Sasikumar,Mukund,India,2.00
+465,Tommaso,Compagnucci,Italy,2.00
+466,Neil,Oberleitner,Austria,2.00
+467,Anton,Matusevich,Great Britain,2.00
+468,Tadeas,Paroulek,Czechia,2.00
+469,Maxwell,McKennon,USA,2.00
+470,Takuya,Kumasaka,Japan,2.00
+471,Branko,Djuric,Serbia,2.00
+472,Gabriele,Pennaforti,Italy,2.00
+473,Jonas,Forejtek,Czechia,2.00
+474,Ergi,Kirkin,Turkiye,2.00
+475,Woobin,Shin,Republic of Korea,2.00
+476,Olaf,Pieczkowski,Poland,2.00
+477,Alvin Nicholas,Tudorica,Canada,2.00
+478,Nikolay,Vylegzhanin,Neutral,2.00
+479,Luca,Potenza,Italy,2.00
+480,Kokoro,Isomura,Japan,2.00
+481,Harry,Wendelken,Great Britain,2.00
+482,Leo,Borg,Sweden,2.00
+483,Sergey,Fomin,Uzbekistan,2.00
+484,Tristan,McCormick,USA,2.00
+485,Bor,Artnak,Slovenia,2.00
+486,Luca,Castelnuovo,Switzerland,2.00
+487,Eric,Vanshelboim,Ukraine,2.00
+488,Tristan,Lamasine,France,2.00
+489,Pedro,Araujo,Portugal,2.00
+490,Ryuki,Matsuda,Japan,2.00
+491,Philip,Sekulic,Australia,2.00
+492,Carlo Alberto,Caniato,Italy,2.00
+493,Vadym,Ursu,Ukraine,2.00
+494,Samir,Banerjee,USA,2.00
+495,Valerio,Aboian,Argentina,2.00
+496,Peter,Fajta,Hungary,2.00
+497,James,Story,Great Britain,2.00
+498,Enzo,Couacaud,France,2.00
+499,Etienne,Donnet,France,2.00
+500,Martin,Krumich,Czechia,2.00

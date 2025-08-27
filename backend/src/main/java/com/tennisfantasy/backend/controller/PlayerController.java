@@ -2,7 +2,9 @@ package com.tennisfantasy.backend.controller;
 
 import com.tennisfantasy.backend.model.Player;
 import com.tennisfantasy.backend.service.SupabaseService;
+import com.tennisfantasy.backend.service.PlayerFetchingThingy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -16,6 +18,12 @@ public class PlayerController {
 
     @Autowired
     private SupabaseService supabaseService;
+    
+    @Autowired
+    private PlayerFetchingThingy playerFetchingThingy;
+    
+    @Value("${sportsradar.api.key}")
+    private String apiKey;
 
     @PostMapping("/test-data")
     public Mono<ResponseEntity<String>> insertTestData() {
@@ -90,5 +98,18 @@ public class PlayerController {
                     }
                 })
                 .onErrorReturn(ResponseEntity.badRequest().body("Failed to check player"));
+    }
+    
+    @PostMapping("/fetch-from-sportsradar")
+    public ResponseEntity<String> fetchFromSportsRadar() {
+        try {
+            System.out.println("🎾 Testing SportsRadar API fetch...");
+            playerFetchingThingy.fetchAndSavePlayers("en", apiKey);
+            return ResponseEntity.ok("✅ Successfully fetched players from SportsRadar! Check console for details.");
+        } catch (Exception e) {
+            System.err.println("❌ SportsRadar fetch failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("❌ Failed to fetch from SportsRadar: " + e.getMessage());
+        }
     }
 }
