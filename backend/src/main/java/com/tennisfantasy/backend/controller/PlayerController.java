@@ -25,14 +25,6 @@ public class PlayerController {
     public Mono<ResponseEntity<String>> insertTestData() {
         // Create test player data
         List<Player> testPlayers = Arrays.asList(
-            new Player("Novak", "Djokovic", "Serbia", 1, new BigDecimal("15.50")),
-            new Player("Carlos", "Alcaraz", "Spain", 2, new BigDecimal("14.75")),
-            new Player("Daniil", "Medvedev", "Russia", 3, new BigDecimal("13.25")),
-            new Player("Jannik", "Sinner", "Italy", 4, new BigDecimal("12.80")),
-            new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")),
-            new Player("roger", "dai", "china", 500, new BigDecimal("2")),
-            new Player("dandan", "hu", "china", 499, new BigDecimal("3")),
-            new Player("ivan", "luo", "china", 488, new BigDecimal("3.5"))
         );
 
         return supabaseService.createPlayersIfNotExists(testPlayers)
@@ -64,12 +56,6 @@ public class PlayerController {
     public Mono<ResponseEntity<String>> smartImportPlayers() {
         // Smart import that checks for duplicates
         List<Player> testPlayers = Arrays.asList(
-            new Player("Novak", "Djokovic", "Serbia", 1, new BigDecimal("15.50")),
-            new Player("Carlos", "Alcaraz", "Spain", 2, new BigDecimal("14.75")),
-            new Player("Daniil", "Medvedev", "Russia", 3, new BigDecimal("13.25")),
-            new Player("Jannik", "Sinner", "Italy", 4, new BigDecimal("12.80")),
-            new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")),
-            new Player("Roger", "Dai", "China", 500, new BigDecimal("2.00"))
         );
 
         return supabaseService.createPlayersIfNotExists(testPlayers)

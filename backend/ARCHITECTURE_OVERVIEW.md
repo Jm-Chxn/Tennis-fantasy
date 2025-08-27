@@ -194,3 +194,4 @@ sportsradar.api.base-url=https://api.sportsradar.com
 - Audit logging
 
 This architecture provides a clean, maintainable, and scalable solution for your tennis fantasy application while keeping all SQL operations in Supabase and focusing your Java code on business logic and data processing.
+

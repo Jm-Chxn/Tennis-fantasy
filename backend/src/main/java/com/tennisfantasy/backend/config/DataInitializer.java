@@ -22,17 +22,6 @@ public class DataInitializer {
             System.out.println("🚀 Auto-import: Loading initial player data...");
             
             List<Player> initialPlayers = Arrays.asList(
-                new Player("Novak", "Djokovic", "Serbia", 1, new BigDecimal("15.50")),
-                new Player("Carlos", "Alcaraz", "Spain", 2, new BigDecimal("14.75")),
-                new Player("Daniil", "Medvedev", "Russia", 3, new BigDecimal("13.25")),
-                new Player("Jannik", "Sinner", "Italy", 4, new BigDecimal("12.80")),
-                new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")),
-                new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")), // DUPLICATE 1
-                new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")), // DUPLICATE 2
-                new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")), // DUPLICATE 3
-                new Player("Roger", "Dai", "China", 500, new BigDecimal("10000.00")),
-                new Player("dandan", "hu", "china", 499, new BigDecimal("3")),
-                new Player("ivan", "luo", "china", 498, new BigDecimal("3.5"))
             );
 
             supabaseService.createPlayersIfNotExists(initialPlayers)
