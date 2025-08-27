@@ -30,7 +30,7 @@ public class DataInitializer {
                 new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")), // DUPLICATE 1
                 new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")), // DUPLICATE 2
                 new Player("Andrey", "Rublev", "Russia", 5, new BigDecimal("11.90")), // DUPLICATE 3
-                new Player("Roger", "Dai", "China", 500, new BigDecimal("2.00")),
+                new Player("Roger", "Dai", "China", 500, new BigDecimal("10000.00")),
                 new Player("dandan", "hu", "china", 499, new BigDecimal("3")),
                 new Player("ivan", "luo", "china", 498, new BigDecimal("3.5"))
             );

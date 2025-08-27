@@ -26,22 +26,29 @@ public class PlayerFetchingThingy {
         this.objectMapper.setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE);
     }
 
-    public void fetchAndSavePlayers(String locale, String apiKey) throws Exception {
-        String json = sportsradarWebClient.get()
+    public String fetchRawData(String locale) {
+        System.out.println("🔍 Fetching data from SportsRadar API for locale: " + locale);
+        
+        String response = sportsradarWebClient.get()
                 .uri(builder -> builder
-                        .path("/{locale}/rankings")
-                        .queryParam("api_key", apiKey)
+                        .path("/{locale}/rankings.json")
                         .build(locale))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-    
-        List<Player> players = parseRankings(json);
-    
-        for (Player playa : players) {
-        //jim add the superbase insert code here 
+        
+        System.out.println("📡 Raw API Response length: " + (response != null ? response.length() : "NULL"));
+        if (response != null && response.length() > 0) {
+            System.out.println("📄 First 500 chars of response: " + response.substring(0, Math.min(500, response.length())));
         }
+        
+        return response;
+    }
+
+    public List<Player> fetchAndParsePlayers(String locale) throws Exception {
+        String json = fetchRawData(locale);
+        return parseRankings(json);
     }
 
 
@@ -52,7 +59,7 @@ public class PlayerFetchingThingy {
 
         for (Rankings rankingGroup : response.getRankings()) {
 
-            for (CompetitorRanking compRank : rankingGroup.getRankings()){
+            for (CompetitorRanking compRank : rankingGroup.getCompetitorRankings()){
                 Competitor c = compRank.getCompetitor();
 
 

@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import com.tennisfantasy.backend.service.PlayerSyncOrchestrator;
 
 @RestController
 @RequestMapping("/players")
@@ -16,6 +17,9 @@ public class PlayerController {
 
     @Autowired
     private SupabaseService supabaseService;
+    
+    @Autowired
+    private PlayerSyncOrchestrator playerSyncOrchestrator;
 
     @PostMapping("/test-data")
     public Mono<ResponseEntity<String>> insertTestData() {
@@ -70,6 +74,15 @@ public class PlayerController {
 
         return supabaseService.createPlayersIfNotExists(testPlayers)
                 .map(result -> ResponseEntity.ok(result));
+    }
+
+    @PostMapping("/sync-from-sportsradar")
+    public Mono<ResponseEntity<String>> syncPlayersFromSportsRadar() {
+        String locale = "en"; // maybe have a param for this later
+        
+        return playerSyncOrchestrator.syncPlayersFromSportsRadar(locale)
+                .map(result -> ResponseEntity.ok(result))
+                .onErrorReturn(ResponseEntity.badRequest().body("Failed to sync players from SportsRadar"));
     }
 
     @GetMapping("/list")
