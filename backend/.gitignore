@@ -43,3 +43,16 @@ Thumbs.db
 ### Maven ###
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.properties
+
+### Environment & Secrets ###
+# IMPORTANT: Never commit API keys!
+.env
+.env.local
+.env.*.local
+*.env
+
+# Local properties with secrets
+application-local.properties
+application-secrets.properties
+src/main/resources/application-local.properties
+src/main/resources/application-secrets.properties
