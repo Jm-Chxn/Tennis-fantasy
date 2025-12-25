@@ -98,7 +98,7 @@ public class DataSyncService {
                 created++;
             } else {
                 // Update existing player
-                updatePlayerFromRanking(player, ranking);
+                updatePlayerFromRanking(player, ranking, tour);
                 updated++;
             }
 
@@ -137,9 +137,13 @@ public class DataSyncService {
     /**
      * Update an existing Player with new ranking data.
      */
-    private void updatePlayerFromRanking(Player player, RankingsResponse.CompetitorRanking ranking) {
+    /**
+     * Update an existing Player with new ranking data.
+     */
+    private void updatePlayerFromRanking(Player player, RankingsResponse.CompetitorRanking ranking, String tour) {
         player.setRanking(ranking.getRank());
         player.setPoints(ranking.getPoints());
+        player.setTour(tour);
         player.setPrice(calculateFantasyPrice(ranking.getRank()));
         player.setLastSyncedAt(LocalDateTime.now());
     }

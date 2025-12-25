@@ -50,10 +50,13 @@ public class SportsRadarService {
         logger.info("Fetching rankings from SportsRadar API");
 
         try {
+            // Full URL: https://api.sportradar.com/tennis/trial/v3/en/rankings.json
             String url = config.buildUrl("/rankings.json");
 
             RankingsResponse response = webClient.get()
                     .uri(url)
+                    .header("accept", "application/json")
+                    .header("x-api-key", config.getApiKey())
                     .retrieve()
                     .bodyToMono(RankingsResponse.class)
                     .block();
@@ -83,7 +86,7 @@ public class SportsRadarService {
         }
 
         return response.getRankings().stream()
-                .filter(r -> "ATP".equalsIgnoreCase(r.getType()))
+                .filter(r -> "ATP".equalsIgnoreCase(r.getName()))
                 .flatMap(r -> r.getCompetitorRankings().stream())
                 .limit(limit)
                 .toList();
@@ -102,7 +105,7 @@ public class SportsRadarService {
         }
 
         return response.getRankings().stream()
-                .filter(r -> "WTA".equalsIgnoreCase(r.getType()))
+                .filter(r -> "WTA".equalsIgnoreCase(r.getName()))
                 .flatMap(r -> r.getCompetitorRankings().stream())
                 .limit(limit)
                 .toList();
@@ -124,6 +127,8 @@ public class SportsRadarService {
 
             ScheduleResponse response = webClient.get()
                     .uri(url)
+                    .header("accept", "application/json")
+                    .header("x-api-key", config.getApiKey())
                     .retrieve()
                     .bodyToMono(ScheduleResponse.class)
                     .block();
@@ -154,6 +159,8 @@ public class SportsRadarService {
 
             ScheduleResponse response = webClient.get()
                     .uri(url)
+                    .header("accept", "application/json")
+                    .header("x-api-key", config.getApiKey())
                     .retrieve()
                     .bodyToMono(ScheduleResponse.class)
                     .block();

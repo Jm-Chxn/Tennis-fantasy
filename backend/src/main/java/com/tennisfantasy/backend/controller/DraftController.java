@@ -64,7 +64,6 @@ public class DraftController {
      * POST /api/leagues/{leagueId}/draft/pick
      * Body: { "leagueMemberId": 1, "playerId": 5 }
      */
-    awdiavwdiuawdiu
     @PostMapping("/pick")
     public ResponseEntity<?> makePick(@PathVariable Long leagueId, @RequestBody Map<String, Object> request) {
         try {

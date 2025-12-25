@@ -22,17 +22,12 @@ public class SportsRadarConfig {
         return apiKey;
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-
     /**
-     * Build full URL with API key for a given endpoint
+     * Build full URL for a given endpoint.
      * Example: buildUrl("/rankings.json") ->
-     * "https://api.sportradar.us/.../rankings.json?api_key=YOUR_KEY"
+     * "https://api.sportradar.com/tennis/trial/v3/en/rankings.json"
      */
     public String buildUrl(String endpoint) {
-        String separator = endpoint.contains("?") ? "&" : "?";
-        return baseUrl + endpoint + separator + "api_key=" + apiKey;
+        return baseUrl + endpoint;
     }
 }
