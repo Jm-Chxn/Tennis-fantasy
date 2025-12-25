@@ -1,10 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { playersApi, Player } from '@/lib/api';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { playersApi, rosterApi, leaguesApi, Player, League } from '@/lib/api';
 import Link from 'next/link';
 
+interface BudgetInfo {
+  budget: number;
+  currentRosterSize: number;
+  maxRosterSize: number;
+  teamName: string;
+}
+
 export default function PlayersPage() {
+  const searchParams = useSearchParams();
+  const leagueIdParam = searchParams.get('leagueId');
+  const leagueId = leagueIdParam ? Number(leagueIdParam) : null;
+
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -12,10 +24,47 @@ export default function PlayersPage() {
   const [selectedTour, setSelectedTour] = useState<'all' | 'ATP' | 'WTA'>('all');
   const [initialized, setInitialized] = useState(false);
 
+  // League/Roster state
+  const [league, setLeague] = useState<League | null>(null);
+  const [budgetInfo, setBudgetInfo] = useState<BudgetInfo | null>(null);
+  const [myRosterPlayerIds, setMyRosterPlayerIds] = useState<Set<number>>(new Set());
+  const [addingPlayer, setAddingPlayer] = useState<number | null>(null);
+
+  // Mock user ID - in real app, get from backend based on supabase ID
+  const userId = 1;
+
   // Fetch players on mount
   useEffect(() => {
     fetchPlayers();
   }, []);
+
+  // Fetch league data if leagueId is provided
+  const fetchLeagueData = useCallback(async () => {
+    if (!leagueId) return;
+    
+    try {
+      const [leagueData, budgetData, rosterData] = await Promise.all([
+        leaguesApi.getById(leagueId),
+        rosterApi.getBudget(leagueId, userId),
+        rosterApi.get(leagueId, userId)
+      ]);
+      setLeague(leagueData);
+      setBudgetInfo(budgetData as BudgetInfo);
+      
+      // Build set of player IDs already on roster
+      const rosterPlayerIds = new Set<number>();
+      (rosterData as { player: Player }[]).forEach((r) => {
+        rosterPlayerIds.add(r.player.id);
+      });
+      setMyRosterPlayerIds(rosterPlayerIds);
+    } catch (err) {
+      console.error('Error fetching league data:', err);
+    }
+  }, [leagueId, userId]);
+
+  useEffect(() => {
+    fetchLeagueData();
+  }, [fetchLeagueData]);
 
   const fetchPlayers = async () => {
     setLoading(true);
@@ -37,6 +86,22 @@ export default function PlayersPage() {
       fetchPlayers();
     } catch (err) {
       setError('Failed to initialize sample data');
+    }
+  };
+
+  const addToRoster = async (playerId: number) => {
+    if (!leagueId) return;
+    
+    setAddingPlayer(playerId);
+    try {
+      await rosterApi.addPlayer(leagueId, userId, playerId);
+      // Refresh budget and roster data
+      await fetchLeagueData();
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add player';
+      alert(errorMessage);
+    } finally {
+      setAddingPlayer(null);
     }
   };
 
@@ -74,6 +139,34 @@ export default function PlayersPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* League Context Bar */}
+        {leagueId && budgetInfo && (
+          <div className="mb-6 bg-gradient-to-r from-yellow-600/20 to-amber-600/20 rounded-xl p-4 border border-yellow-500/30">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-yellow-200 text-sm">Adding to: <span className="text-white font-bold">{league?.name || 'League'}</span></p>
+                <p className="text-yellow-100 text-xs">Team: {budgetInfo.teamName}</p>
+              </div>
+              <div className="flex items-center gap-6">
+                <div>
+                  <p className="text-yellow-200 text-xs">Budget</p>
+                  <p className="text-2xl font-bold text-white">💰 ${budgetInfo.budget?.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-yellow-200 text-xs">Roster</p>
+                  <p className="text-2xl font-bold text-white">{budgetInfo.currentRosterSize}/{budgetInfo.maxRosterSize}</p>
+                </div>
+                <Link
+                  href={`/leagues/${leagueId}/roster`}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm"
+                >
+                  View Roster →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Title */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Player Database</h1>
@@ -187,6 +280,33 @@ export default function PlayersPage() {
                       <p className="text-yellow-400 font-semibold">${player.price?.toFixed(2) || '0.00'}</p>
                     </div>
                   </div>
+
+                  {/* Add to Roster Button */}
+                  {leagueId && (
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                      {myRosterPlayerIds.has(player.id) ? (
+                        <div className="w-full py-2 bg-green-600/20 text-green-400 text-center rounded-lg text-sm font-medium">
+                          ✓ On Your Roster
+                        </div>
+                      ) : budgetInfo && (player.price || 0) > budgetInfo.budget ? (
+                        <div className="w-full py-2 bg-red-600/20 text-red-400 text-center rounded-lg text-sm">
+                          Insufficient Budget
+                        </div>
+                      ) : budgetInfo && budgetInfo.currentRosterSize >= budgetInfo.maxRosterSize ? (
+                        <div className="w-full py-2 bg-yellow-600/20 text-yellow-400 text-center rounded-lg text-sm">
+                          Roster Full
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => addToRoster(player.id)}
+                          disabled={addingPlayer === player.id}
+                          className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium rounded-lg transition-all disabled:opacity-50"
+                        >
+                          {addingPlayer === player.id ? 'Adding...' : '+ Add to Roster'}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

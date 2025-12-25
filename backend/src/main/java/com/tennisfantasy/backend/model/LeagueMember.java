@@ -57,6 +57,10 @@ public class LeagueMember {
     @Column(name = "losses")
     private Integer losses = 0;
 
+    // Budget remaining for roster building (salary cap)
+    @Column(name = "budget")
+    private Double budget = 100.0;
+
     // Is this member the league commissioner/owner?
     @Column(name = "is_commissioner")
     private Boolean isCommissioner = false;
@@ -159,6 +163,14 @@ public class LeagueMember {
 
     public void setLosses(Integer losses) {
         this.losses = losses;
+    }
+
+    public Double getBudget() {
+        return budget;
+    }
+
+    public void setBudget(Double budget) {
+        this.budget = budget;
     }
 
     public Boolean getIsCommissioner() {

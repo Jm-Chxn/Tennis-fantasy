@@ -4,23 +4,17 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-// Mock data for dashboard (replace with real API calls)
-const mockLeagues = [
-  { id: 1, name: 'ATP Masters League', members: 6, maxTeams: 8, rank: 2, points: 156 },
-  { id: 2, name: 'Grand Slam Fantasy', members: 8, maxTeams: 8, rank: 4, points: 98 },
-];
-
-const mockRecentActivity = [
-  { id: 1, type: 'points', message: 'Djokovic won match: +15 points', time: '2 hours ago' },
-  { id: 2, type: 'draft', message: 'You drafted Alcaraz in Round 1', time: '1 day ago' },
-  { id: 3, type: 'league', message: 'John joined your league', time: '2 days ago' },
-];
+import { leaguesApi } from '@/lib/api';
 
 export default function DashboardPage() {
   const { user, signOut, loading } = useAuth();
   const router = useRouter();
   const [showCreateLeague, setShowCreateLeague] = useState(false);
+  const [leagues, setLeagues] = useState<any[]>([]);
+  const [leagueName, setLeagueName] = useState('');
+  const [teamName, setTeamName] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState('');
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -28,6 +22,40 @@ export default function DashboardPage() {
       router.push('/login');
     }
   }, [user, loading, router]);
+
+  // Fetch user's leagues
+  useEffect(() => {
+    const fetchLeagues = async () => {
+      if (!user) return;
+      try {
+        // For demo, fetch all leagues (should filter by user in real app)
+        const allLeagues = await leaguesApi.getAll();
+        setLeagues(allLeagues);
+      } catch (err) {
+        setError('Failed to load leagues');
+      }
+    };
+    fetchLeagues();
+  }, [user, creating]);
+
+  const handleCreateLeague = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leagueName || !teamName) return;
+    setCreating(true);
+    setError('');
+    try {
+      // Use mock userId for now
+      const userId = user?.id || 1;
+      await leaguesApi.create({ name: leagueName, userId, teamName });
+      setShowCreateLeague(false);
+      setLeagueName('');
+      setTeamName('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to create league');
+    } finally {
+      setCreating(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -109,7 +137,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-4">
-              {mockLeagues.map((league) => (
+              {leagues.length > 0 ? leagues.map((league) => (
                 <div
                   key={league.id}
                   className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 hover:border-green-500/50 transition-all"
@@ -117,11 +145,7 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-xl font-bold text-white mb-1">{league.name}</h3>
-                      <p className="text-green-200 text-sm">{league.members}/{league.maxTeams} teams</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-3xl font-bold text-green-400">#{league.rank}</p>
-                      <p className="text-green-200 text-sm">{league.points} pts</p>
+                      <p className="text-green-200 text-sm">{league.currentTeams || 1}/{league.maxTeams} teams</p>
                     </div>
                   </div>
                   <div className="mt-4 flex gap-2">
@@ -139,9 +163,7 @@ export default function DashboardPage() {
                     </Link>
                   </div>
                 </div>
-              ))}
-
-              {mockLeagues.length === 0 && (
+              )) : (
                 <div className="bg-white/5 rounded-xl p-8 text-center border border-dashed border-white/20">
                   <p className="text-green-200 mb-4">You haven&apos;t joined any leagues yet</p>
                   <button className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
@@ -210,23 +232,30 @@ export default function DashboardPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-slate-800 rounded-2xl p-8 w-full max-w-md border border-white/10">
             <h2 className="text-2xl font-bold text-white mb-6">Create New League</h2>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleCreateLeague}>
               <div>
                 <label className="block text-green-100 text-sm font-medium mb-2">League Name</label>
                 <input
                   type="text"
+                  value={leagueName}
+                  onChange={e => setLeagueName(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   placeholder="My Awesome League"
+                  required
                 />
               </div>
               <div>
                 <label className="block text-green-100 text-sm font-medium mb-2">Your Team Name</label>
                 <input
                   type="text"
+                  value={teamName}
+                  onChange={e => setTeamName(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
                   placeholder="The Aces"
+                  required
                 />
               </div>
+              {error && <div className="text-red-400 text-sm">{error}</div>}
               <div className="flex gap-4 mt-6">
                 <button
                   type="button"
@@ -238,8 +267,9 @@ export default function DashboardPage() {
                 <button
                   type="submit"
                   className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                  disabled={creating}
                 >
-                  Create
+                  {creating ? 'Creating...' : 'Create'}
                 </button>
               </div>
             </form>

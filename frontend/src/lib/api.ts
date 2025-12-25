@@ -111,6 +111,18 @@ export const rosterApi = {
             method: 'PUT',
             body: JSON.stringify({ userId, starterIds, benchIds }),
         }),
+    getBudget: (leagueId: number, userId: number) =>
+        fetchApi(`/leagues/${leagueId}/roster/budget?userId=${userId}`),
+    addPlayer: (leagueId: number, userId: number, playerId: number) =>
+        fetchApi(`/leagues/${leagueId}/roster/add`, {
+            method: 'POST',
+            body: JSON.stringify({ userId, playerId }),
+        }),
+    remove: (leagueId: number, userId: number, playerId: number) =>
+        fetchApi(`/leagues/${leagueId}/roster/remove`, {
+            method: 'DELETE',
+            body: JSON.stringify({ userId, playerId }),
+        }),
 };
 
 // Scoring
