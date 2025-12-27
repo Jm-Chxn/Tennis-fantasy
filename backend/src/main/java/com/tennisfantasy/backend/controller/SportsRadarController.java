@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/sportradar")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class SportsRadarController {
 
     private final SportsRadarService sportsRadarService;

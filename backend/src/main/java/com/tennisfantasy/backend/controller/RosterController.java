@@ -20,14 +20,15 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/leagues/{leagueId}/roster")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class RosterController {
 
     private final RosterRepository rosterRepository;
     private final LeagueMemberRepository leagueMemberRepository;
     private final PlayerRepository playerRepository;
 
-    public RosterController(RosterRepository rosterRepository, LeagueMemberRepository leagueMemberRepository, PlayerRepository playerRepository) {
+    public RosterController(RosterRepository rosterRepository, LeagueMemberRepository leagueMemberRepository,
+            PlayerRepository playerRepository) {
         this.rosterRepository = rosterRepository;
         this.leagueMemberRepository = leagueMemberRepository;
         this.playerRepository = playerRepository;
@@ -147,7 +148,8 @@ public class RosterController {
             // Check budget
             double playerPrice = player.getPrice() != null ? player.getPrice().doubleValue() : 0.0;
             if (member.getBudget() < playerPrice) {
-                throw new RuntimeException("Insufficient budget. Need $" + playerPrice + " but only have $" + member.getBudget());
+                throw new RuntimeException(
+                        "Insufficient budget. Need $" + playerPrice + " but only have $" + member.getBudget());
             }
 
             // Check roster size limit (get from league)
@@ -187,7 +189,8 @@ public class RosterController {
      * Body: { "userId": 1, "playerId": 123 }
      */
     @DeleteMapping("/remove")
-    public ResponseEntity<?> removePlayerFromRoster(@PathVariable Long leagueId, @RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> removePlayerFromRoster(@PathVariable Long leagueId,
+            @RequestBody Map<String, Object> request) {
         try {
             Long userId = ((Number) request.get("userId")).longValue();
             Long playerId = ((Number) request.get("playerId")).longValue();
@@ -231,7 +234,7 @@ public class RosterController {
                 .map(member -> {
                     List<Roster> roster = rosterRepository.findByLeagueMemberId(member.getId());
                     int rosterSize = member.getLeague().getRosterSize();
-                    
+
                     Map<String, Object> response = new HashMap<>();
                     response.put("budget", member.getBudget());
                     response.put("currentRosterSize", roster.size());

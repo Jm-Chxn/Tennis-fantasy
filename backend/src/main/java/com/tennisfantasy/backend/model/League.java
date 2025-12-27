@@ -27,7 +27,7 @@ public class League {
     private String description;
 
     // League owner/creator
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id")
     private User owner;
 

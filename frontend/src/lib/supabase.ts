@@ -7,7 +7,13 @@
 //    NEXT_PUBLIC_SUPABASE_URL=your-project-url
 //    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
-// For now, we'll use mock functions that you can replace with Supabase later
+import { createClient, User as SupabaseUser } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+
+// Initialize Supabase client
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export interface User {
     id: string;
@@ -15,70 +21,74 @@ export interface User {
     displayName: string;
 }
 
-// Mock auth state (replace with Supabase when you have credentials)
-let currentUser: User | null = null;
+// Helper to transform Supabase user to our User type
+const mapSupabaseUser = (u: SupabaseUser | null): User | null => {
+    if (!u) return null;
+    return {
+        id: u.id,
+        email: u.email!,
+        displayName: u.user_metadata?.display_name || u.email?.split('@')[0] || 'User',
+    };
+};
 
-// Simulated Supabase Auth functions
 export const supabaseAuth = {
     // Sign up new user
     signUp: async (email: string, password: string, displayName: string): Promise<User> => {
-        // In production, this would call Supabase
-        // const { data, error } = await supabase.auth.signUp({ email, password })
-
-        const user: User = {
-            id: 'mock-' + Date.now(),
+        const { data, error } = await supabase.auth.signUp({
             email,
-            displayName,
-        };
-        currentUser = user;
-        localStorage.setItem('tennis_fantasy_user', JSON.stringify(user));
-        return user;
+            password,
+            options: {
+                data: {
+                    display_name: displayName,
+                },
+            },
+        });
+
+        if (error) throw error;
+        if (!data.user) throw new Error('Signup failed');
+
+        return mapSupabaseUser(data.user)!;
     },
 
     // Sign in existing user
     signIn: async (email: string, password: string): Promise<User> => {
-        // In production, this would call Supabase
-        // const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-
-        const user: User = {
-            id: 'mock-' + Date.now(),
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
-            displayName: email.split('@')[0],
-        };
-        currentUser = user;
-        localStorage.setItem('tennis_fantasy_user', JSON.stringify(user));
-        return user;
+            password,
+        });
+
+        if (error) throw error;
+        if (!data.user) throw new Error('Login failed');
+
+        return mapSupabaseUser(data.user)!;
     },
 
     // Sign out
     signOut: async (): Promise<void> => {
-        currentUser = null;
-        localStorage.removeItem('tennis_fantasy_user');
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
     },
 
     // Get current user
     getUser: (): User | null => {
-        if (currentUser) return currentUser;
-
-        if (typeof window !== 'undefined') {
-            const stored = localStorage.getItem('tennis_fantasy_user');
-            if (stored) {
-                currentUser = JSON.parse(stored);
-                return currentUser;
-            }
-        }
-        return null;
+        // This is a synchronous check that might not be perfect for SSR
+        // For accurate auth state, use onAuthStateChange listener
+        // But for this simple implementation we'll try to get session
+        // Note: getUser in supabase-js is async usually, but we can check session
+        return null; // Will rely on AuthContext to manage state via async calls
     },
 
     // Get auth token (for API calls)
     getToken: async (): Promise<string | null> => {
-        // In production, this would get the Supabase JWT
-        // const { data: { session } } = await supabase.auth.getSession()
-        // return session?.access_token
-
-        return currentUser ? 'mock-token-' + currentUser.id : null;
+        const { data: { session } } = await supabase.auth.getSession();
+        return session?.access_token || null;
     },
+
+    // Get current session user async
+    getCurrentUser: async (): Promise<User | null> => {
+        const { data: { user } } = await supabase.auth.getUser();
+        return mapSupabaseUser(user);
+    }
 };
 
-// Export type for TypeScript
 export type SupabaseAuth = typeof supabaseAuth;

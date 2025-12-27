@@ -16,7 +16,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/leagues/{leagueId}/draft")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class DraftController {
 
     private final DraftService draftService;

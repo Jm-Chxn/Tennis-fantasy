@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { leaguesApi, rosterApi, League, Player } from '@/lib/api';
+import { leaguesApi, rosterApi, authApi, League, Player } from '@/lib/api';
 
 interface RosterPlayer {
   id: number;
@@ -37,8 +37,24 @@ export default function RosterPage() {
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
-  // Mock user ID - in real app, get from backend based on supabase ID
-  const userId = 1;
+  const [backendUserId, setBackendUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchBackendUser = async () => {
+      if (user?.id) {
+        try {
+          const profile = await authApi.getProfile(user.id) as { id: number };
+          setBackendUserId(profile.id);
+        } catch (err) {
+          console.error('Failed to fetch user profile', err);
+        }
+      }
+    };
+    fetchBackendUser();
+  }, [user]);
+
+  // Use backendUserId instead of 1
+  const userId = backendUserId;
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -47,6 +63,7 @@ export default function RosterPage() {
   }, [user, authLoading, router]);
 
   const fetchData = useCallback(async () => {
+    if (!userId) return;
     setLoading(true);
     try {
       const [leagueData, rosterData, budgetData] = await Promise.all([
@@ -72,6 +89,10 @@ export default function RosterPage() {
   }, [leagueId, user, fetchData]);
 
   const removePlayer = async (playerId: number) => {
+    if (!userId) {
+      alert('User profile not loaded');
+      return;
+    }
     setActionLoading(playerId);
     try {
       await rosterApi.remove(leagueId, userId, playerId);
@@ -85,6 +106,10 @@ export default function RosterPage() {
   };
 
   const toggleStarter = async (playerId: number, currentIsStarter: boolean) => {
+    if (!userId) {
+      alert('User profile not loaded');
+      return;
+    }
     setActionLoading(playerId);
     try {
       const starters = roster.filter(r => r.isStarter).map(r => r.player.id);
@@ -162,6 +187,7 @@ export default function RosterPage() {
           </div>
           <nav className="flex gap-4">
             <Link href="/dashboard" className="text-green-200 hover:text-white transition-colors">Dashboard</Link>
+            <Link href="/leagues" className="text-green-200 hover:text-white transition-colors">Leagues</Link>
             <Link href="/players" className="text-green-200 hover:text-white transition-colors">Players</Link>
             <Link href="/leaderboard" className="text-green-200 hover:text-white transition-colors">Leaderboard</Link>
           </nav>
@@ -238,11 +264,10 @@ export default function RosterPage() {
                             {rosterEntry.player.firstName} {rosterEntry.player.lastName}
                           </h3>
                           <div className="flex items-center gap-2 text-sm">
-                            <span className={`px-2 py-0.5 rounded ${
-                              rosterEntry.player.tour === 'ATP' 
-                                ? 'bg-blue-500/20 text-blue-300' 
-                                : 'bg-pink-500/20 text-pink-300'
-                            }`}>
+                            <span className={`px-2 py-0.5 rounded ${rosterEntry.player.tour === 'ATP'
+                              ? 'bg-blue-500/20 text-blue-300'
+                              : 'bg-pink-500/20 text-pink-300'
+                              }`}>
                               {rosterEntry.player.tour}
                             </span>
                             <span className="text-green-200">{rosterEntry.player.country}</span>
@@ -275,7 +300,7 @@ export default function RosterPage() {
               ) : (
                 <div className="bg-white/5 rounded-xl p-8 text-center border border-dashed border-white/20">
                   <p className="text-green-200 mb-4">No starters yet</p>
-                  <Link 
+                  <Link
                     href={`/players?leagueId=${leagueId}`}
                     className="text-green-400 hover:text-green-300"
                   >
@@ -309,11 +334,10 @@ export default function RosterPage() {
                             {rosterEntry.player.firstName} {rosterEntry.player.lastName}
                           </h3>
                           <div className="flex items-center gap-2 text-sm">
-                            <span className={`px-2 py-0.5 rounded ${
-                              rosterEntry.player.tour === 'ATP' 
-                                ? 'bg-blue-500/20 text-blue-300' 
-                                : 'bg-pink-500/20 text-pink-300'
-                            }`}>
+                            <span className={`px-2 py-0.5 rounded ${rosterEntry.player.tour === 'ATP'
+                              ? 'bg-blue-500/20 text-blue-300'
+                              : 'bg-pink-500/20 text-pink-300'
+                              }`}>
                               {rosterEntry.player.tour}
                             </span>
                             <span className="text-green-200">{rosterEntry.player.country}</span>

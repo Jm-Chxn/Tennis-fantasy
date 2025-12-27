@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabaseAuth, User } from '@/lib/supabase';
+import { supabaseAuth, User, supabase } from '@/lib/supabase';
 import { authApi } from '@/lib/api';
 
 interface AuthContextType {
@@ -20,9 +20,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Check for existing session on mount
     useEffect(() => {
-        const currentUser = supabaseAuth.getUser();
-        setUser(currentUser);
-        setLoading(false);
+        // Check for current session
+        const initSession = async () => {
+            const user = await supabaseAuth.getCurrentUser();
+            setUser(user);
+            setLoading(false);
+        };
+        initSession();
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            if (session?.user) {
+                const user = await supabaseAuth.getCurrentUser();
+                if (user) {
+                    // Automatically sync/register with backend on every session change
+                    try {
+                        await authApi.register({
+                            supabaseId: user.id,
+                            email: user.email,
+                            displayName: user.displayName,
+                        });
+                    } catch (err) {
+                        console.error('Failed to sync user with backend', err);
+                    }
+                }
+                setUser(user);
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, []);
 
     // Sign in

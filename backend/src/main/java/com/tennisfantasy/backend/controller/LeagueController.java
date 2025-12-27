@@ -20,8 +20,9 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/leagues")
-@CrossOrigin(origins = "http://localhost:3000")
 public class LeagueController {
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(LeagueController.class);
 
     private final LeagueService leagueService;
     private final UserRepository userRepository;
@@ -38,7 +39,10 @@ public class LeagueController {
      */
     @GetMapping
     public ResponseEntity<List<League>> getAllLeagues() {
-        return ResponseEntity.ok(leagueService.getAllLeagues());
+        logger.info(">>> GET /api/leagues - Fetching all leagues");
+        List<League> leagues = leagueService.getAllLeagues();
+        logger.info(">>> GET /api/leagues - Found: {} leagues", leagues.size());
+        return ResponseEntity.ok(leagues);
     }
 
     /**
@@ -96,10 +100,15 @@ public class LeagueController {
                 league.setIsPublic((Boolean) request.get("isPublic"));
             }
 
+            logger.info(">>> POST /api/leagues - Creating league: {} for user ID: {}", name, userId);
             League createdLeague = leagueService.createLeague(league, owner, teamName);
+            logger.info(">>> POST /api/leagues - Created league: {} (ID: {}) for owner: {}", createdLeague.getName(),
+                    createdLeague.getId(),
+                    owner.getDisplayName());
             return ResponseEntity.status(HttpStatus.CREATED).body(createdLeague);
 
         } catch (Exception e) {
+            logger.error(">>> POST /api/leagues - ERROR creating league: {}", e.getMessage());
             Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(error);

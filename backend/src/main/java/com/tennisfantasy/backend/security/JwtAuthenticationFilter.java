@@ -14,10 +14,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -45,57 +47,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            String jwt = extractJwtFromRequest(request);
+            String bearerToken = request.getHeader("Authorization");
+            String uri = request.getRequestURI();
+            String method = request.getMethod();
 
-            if (jwt != null && validateToken(jwt)) {
-                Claims claims = parseToken(jwt);
-                String supabaseId = claims.getSubject();
-                String email = claims.get("email", String.class);
+            if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+                String jwtToken = bearerToken.substring(7);
+                try {
+                    Claims claims = parseToken(jwtToken);
+                    if (claims != null) {
+                        String supabaseId = claims.getSubject();
+                        logger.info(">>> Authenticated User: {} for {} {}", supabaseId, method, uri);
 
-                // Create authentication token
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        supabaseId, // Principal (the user ID)
-                        email, // Credentials (the email)
-                        Collections.emptyList() // Authorities (empty for now)
-                );
-
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Set authentication in context
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                logger.debug("Authenticated user: {} ({})", supabaseId, email);
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                supabaseId, null, new ArrayList<>());
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    } else {
+                        logger.warn(">>> Auth failed (null claims) for {} {}", method, uri);
+                    }
+                } catch (Exception e) {
+                    logger.error(">>> Internal Auth Error for {} {}: {}", method, uri, e.getMessage());
+                }
+            } else {
+                // Public endpoints won't have the token, which is fine
+                // But we should know if a protected one is missing it
+                logger.debug(">>> No Bearer token for {} {}", method, uri);
             }
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e.getMessage());
+            logger.error(">>> Cannot set user authentication: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    /**
-     * Extract JWT from Authorization header.
-     * Expects format: "Bearer <token>"
-     */
-    private String extractJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-
-    /**
-     * Validate the JWT token.
-     */
-    private boolean validateToken(String token) {
-        try {
-            parseToken(token);
-            return true;
-        } catch (Exception e) {
-            logger.warn("Invalid JWT token: {}", e.getMessage());
-            return false;
-        }
     }
 
     /**
@@ -103,7 +86,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private Claims parseToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8)))
+                .setSigningKeyResolver(new io.jsonwebtoken.SigningKeyResolverAdapter() {
+                    @Override
+                    public java.security.Key resolveSigningKey(io.jsonwebtoken.JwsHeader header, Claims claims) {
+                        String alg = header.getAlgorithm();
+                        String kid = (String) header.get("kid");
+                        logger.info(">>> Incoming Token - Alg: {}, Key ID (kid): {}", alg, kid);
+
+                        if ("HS256".equals(alg)) {
+                            // Standard Supabase implementation uses the UTF-8 bytes of the symmetric secret
+                            // string.
+                            byte[] keyBytes = jwtSecret.trim().getBytes(StandardCharsets.UTF_8);
+                            return Keys.hmacShaKeyFor(keyBytes);
+                        }
+
+                        logger.error("Algorithm {} is not supported. Please rotate your Supabase keys to use HS256.",
+                                alg);
+                        return null;
+                    }
+                })
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

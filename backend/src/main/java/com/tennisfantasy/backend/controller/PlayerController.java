@@ -12,23 +12,23 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/players")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class PlayerController {
-    
+
     private final PlayerService playerService;
-    
+
     @Autowired
     public PlayerController(PlayerService playerService) {
         this.playerService = playerService;
     }
-    
+
     // Get all players
     @GetMapping
     public ResponseEntity<List<Player>> getAllPlayers() {
         List<Player> players = playerService.getAllPlayers();
         return ResponseEntity.ok(players);
     }
-    
+
     // Get player by ID
     @GetMapping("/{id}")
     public ResponseEntity<Player> getPlayerById(@PathVariable Long id) {
@@ -36,14 +36,14 @@ public class PlayerController {
         return player.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
     // Create new player
     @PostMapping
     public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
         Player createdPlayer = playerService.createPlayer(player);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPlayer);
     }
-    
+
     // Update existing player
     @PutMapping("/{id}")
     public ResponseEntity<Player> updatePlayer(@PathVariable Long id, @RequestBody Player playerDetails) {
@@ -54,35 +54,35 @@ public class PlayerController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     // Delete player
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
         playerService.deletePlayer(id);
         return ResponseEntity.noContent().build();
     }
-    
+
     // Get players by country
     @GetMapping("/country/{country}")
     public ResponseEntity<List<Player>> getPlayersByCountry(@PathVariable String country) {
         List<Player> players = playerService.getPlayersByCountry(country);
         return ResponseEntity.ok(players);
     }
-    
+
     // Get players by position
     @GetMapping("/position/{position}")
     public ResponseEntity<List<Player>> getPlayersByPosition(@PathVariable String position) {
         List<Player> players = playerService.getPlayersByPosition(position);
         return ResponseEntity.ok(players);
     }
-    
+
     // Get active players
     @GetMapping("/active")
     public ResponseEntity<List<Player>> getActivePlayers() {
         List<Player> players = playerService.getActivePlayers();
         return ResponseEntity.ok(players);
     }
-    
+
     // Get players by ranking range
     @GetMapping("/ranking")
     public ResponseEntity<List<Player>> getPlayersByRankingRange(
@@ -91,21 +91,21 @@ public class PlayerController {
         List<Player> players = playerService.getPlayersByRankingRange(minRanking, maxRanking);
         return ResponseEntity.ok(players);
     }
-    
+
     // Search players by name
     @GetMapping("/search")
     public ResponseEntity<List<Player>> searchPlayersByName(@RequestParam String name) {
         List<Player> players = playerService.searchPlayersByName(name);
         return ResponseEntity.ok(players);
     }
-    
+
     // Get top ranked players
     @GetMapping("/top-ranked")
     public ResponseEntity<List<Player>> getTopRankedPlayers() {
         List<Player> players = playerService.getTopRankedPlayers();
         return ResponseEntity.ok(players);
     }
-    
+
     // Get players by price range
     @GetMapping("/price-range")
     public ResponseEntity<List<Player>> getPlayersByPriceRange(
@@ -114,14 +114,14 @@ public class PlayerController {
         List<Player> players = playerService.getPlayersByPriceRange(minPrice, maxPrice);
         return ResponseEntity.ok(players);
     }
-    
+
     // Get player count by country
     @GetMapping("/count/country/{country}")
     public ResponseEntity<Long> getPlayerCountByCountry(@PathVariable String country) {
         long count = playerService.getPlayerCountByCountry(country);
         return ResponseEntity.ok(count);
     }
-    
+
     // Initialize sample data
     @PostMapping("/init-sample-data")
     public ResponseEntity<String> initializeSampleData() {

@@ -17,7 +17,7 @@ export default function Leaderboard() {
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">Current Standings</h2>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -234,13 +234,13 @@ export default function Leaderboard() {
             <p className="text-3xl font-bold text-blue-600">#12</p>
             <p className="text-sm text-gray-500">Top 20% of all managers</p>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Points to Next Rank</h3>
             <p className="text-3xl font-bold text-green-600">+156</p>
             <p className="text-sm text-gray-500">You're gaining ground!</p>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">League Size</h3>
             <p className="text-3xl font-bold text-purple-600">1,247</p>

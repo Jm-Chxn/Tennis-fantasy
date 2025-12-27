@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { leaguesApi } from '@/lib/api';
+import { leaguesApi, authApi } from '@/lib/api';
 
 export default function DashboardPage() {
   const { user, signOut, loading } = useAuth();
@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [teamName, setTeamName] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const [backendUserId, setBackendUserId] = useState<number | null>(null);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -23,30 +24,34 @@ export default function DashboardPage() {
     }
   }, [user, loading, router]);
 
-  // Fetch user's leagues
+  // Fetch user's backend profile and leagues
   useEffect(() => {
-    const fetchLeagues = async () => {
-      if (!user) return;
+    const fetchProfileAndLeagues = async () => {
       try {
-        // For demo, fetch all leagues (should filter by user in real app)
+        if (!user) return;
+        // Get backend user profile by supabaseId
+        const profile = await authApi.getProfile(user.id);
+        setBackendUserId(profile.id);
         const allLeagues = await leaguesApi.getAll();
         setLeagues(allLeagues);
       } catch (err) {
-        setError('Failed to load leagues');
+        setError('Failed to load leagues or user profile');
+        setLeagues([]);
       }
     };
-    fetchLeagues();
+    fetchProfileAndLeagues();
   }, [user, creating]);
 
   const handleCreateLeague = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!leagueName || !teamName) return;
+    if (!leagueName || !teamName || !backendUserId) {
+      setError('Missing required info.');
+      return;
+    }
     setCreating(true);
     setError('');
     try {
-      // Use mock userId for now
-      const userId = user?.id || 1;
-      await leaguesApi.create({ name: leagueName, userId, teamName });
+      await leaguesApi.create({ name: leagueName, userId: backendUserId, teamName });
       setShowCreateLeague(false);
       setLeagueName('');
       setTeamName('');
@@ -66,7 +71,11 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-xl">Not signed in</div>
+      </div>
+    );
   }
 
   return (
@@ -177,16 +186,8 @@ export default function DashboardPage() {
           {/* Recent Activity */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">Recent Activity</h2>
-            <div className="bg-white/5 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
-              {mockRecentActivity.map((activity, index) => (
-                <div
-                  key={activity.id}
-                  className={`p-4 ${index !== mockRecentActivity.length - 1 ? 'border-b border-white/10' : ''}`}
-                >
-                  <p className="text-white text-sm">{activity.message}</p>
-                  <p className="text-green-300 text-xs mt-1">{activity.time}</p>
-                </div>
-              ))}
+            <div className="bg-white/5 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden p-8 text-center text-green-200">
+              No recent activity yet.
             </div>
           </div>
         </div>

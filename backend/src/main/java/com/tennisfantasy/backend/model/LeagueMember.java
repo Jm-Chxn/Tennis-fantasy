@@ -19,12 +19,12 @@ public class LeagueMember {
     private Long id;
 
     // The league this membership belongs to
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "league_id", nullable = false)
     private League league;
 
     // The user who is a member
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

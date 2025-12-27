@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { playersApi, rosterApi, leaguesApi, Player, League } from '@/lib/api';
+import { playersApi, rosterApi, leaguesApi, authApi, Player, League } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
 interface BudgetInfo {
@@ -30,8 +31,25 @@ export default function PlayersPage() {
   const [myRosterPlayerIds, setMyRosterPlayerIds] = useState<Set<number>>(new Set());
   const [addingPlayer, setAddingPlayer] = useState<number | null>(null);
 
-  // Mock user ID - in real app, get from backend based on supabase ID
-  const userId = 1;
+  const { user, loading: authLoading } = useAuth();
+  const [backendUserId, setBackendUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchBackendUser = async () => {
+      if (user?.id) {
+        try {
+          const profile = await authApi.getProfile(user.id);
+          setBackendUserId(profile.id);
+        } catch (err) {
+          console.error('Failed to fetch user profile', err);
+        }
+      }
+    };
+    fetchBackendUser();
+  }, [user]);
+
+  // Use backendUserId instead of 1
+  const userId = backendUserId;
 
   // Fetch players on mount
   useEffect(() => {
@@ -41,7 +59,7 @@ export default function PlayersPage() {
   // Fetch league data if leagueId is provided
   const fetchLeagueData = useCallback(async () => {
     if (!leagueId) return;
-    
+
     try {
       const [leagueData, budgetData, rosterData] = await Promise.all([
         leaguesApi.getById(leagueId),
@@ -50,7 +68,7 @@ export default function PlayersPage() {
       ]);
       setLeague(leagueData);
       setBudgetInfo(budgetData as BudgetInfo);
-      
+
       // Build set of player IDs already on roster
       const rosterPlayerIds = new Set<number>();
       (rosterData as { player: Player }[]).forEach((r) => {
@@ -91,7 +109,7 @@ export default function PlayersPage() {
 
   const addToRoster = async (playerId: number) => {
     if (!leagueId) return;
-    
+
     setAddingPlayer(playerId);
     try {
       await rosterApi.addPlayer(leagueId, userId, playerId);
@@ -133,6 +151,7 @@ export default function PlayersPage() {
           </div>
           <nav className="flex gap-4">
             <Link href="/dashboard" className="text-green-200 hover:text-white transition-colors">Dashboard</Link>
+            <Link href="/leagues" className="text-green-200 hover:text-white transition-colors">Leagues</Link>
             <Link href="/leaderboard" className="text-green-200 hover:text-white transition-colors">Leaderboard</Link>
           </nav>
         </div>
@@ -250,8 +269,8 @@ export default function PlayersPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${player.tour === 'ATP'
-                          ? 'bg-blue-500/20 text-blue-300'
-                          : 'bg-pink-500/20 text-pink-300'
+                        ? 'bg-blue-500/20 text-blue-300'
+                        : 'bg-pink-500/20 text-pink-300'
                         }`}>
                         {player.tour}
                       </span>
