@@ -1,13 +1,17 @@
 package com.tennisfantasy.backend.controller;
 
 import com.tennisfantasy.backend.model.User;
+import com.tennisfantasy.backend.model.LeagueMember;
 import com.tennisfantasy.backend.repository.UserRepository;
+import com.tennisfantasy.backend.repository.LeagueMemberRepository;
+import com.tennisfantasy.backend.repository.RosterRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,9 +28,13 @@ import java.util.Optional;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final LeagueMemberRepository leagueMemberRepository;
+    private final RosterRepository rosterRepository;
 
-    public AuthController(UserRepository userRepository) {
+    public AuthController(UserRepository userRepository, LeagueMemberRepository leagueMemberRepository, RosterRepository rosterRepository) {
         this.userRepository = userRepository;
+        this.leagueMemberRepository = leagueMemberRepository;
+        this.rosterRepository = rosterRepository;
     }
 
     /**
@@ -135,5 +143,55 @@ public class AuthController {
         response.put("status", "ok");
         response.put("service", "auth");
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get user stats for dashboard.
+     * 
+     * GET /api/auth/stats/{userId}
+     * Returns: totalPoints, activeLeagues, bestRank, playersDrafted
+     */
+    @GetMapping("/stats/{userId}")
+    public ResponseEntity<?> getUserStats(@PathVariable Long userId) {
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            List<LeagueMember> memberships = leagueMemberRepository.findByUserId(userId);
+            
+            // Calculate total points across all leagues
+            int totalPoints = memberships.stream()
+                    .mapToInt(m -> m.getTotalPoints() != null ? m.getTotalPoints() : 0)
+                    .sum();
+            
+            // Count active leagues
+            int activeLeagues = memberships.size();
+            
+            // Find best rank (lowest number is best)
+            Integer bestRank = memberships.stream()
+                    .map(LeagueMember::getLeagueRank)
+                    .filter(r -> r != null && r > 0)
+                    .min(Integer::compareTo)
+                    .orElse(0);
+            
+            // Count total players drafted across all leagues
+            int playersDrafted = 0;
+            for (LeagueMember member : memberships) {
+                playersDrafted += rosterRepository.countByLeagueMemberId(member.getId());
+            }
+
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("totalPoints", totalPoints);
+            stats.put("activeLeagues", activeLeagues);
+            stats.put("bestRank", bestRank);
+            stats.put("playersDrafted", playersDrafted);
+
+            return ResponseEntity.ok(stats);
+
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 }

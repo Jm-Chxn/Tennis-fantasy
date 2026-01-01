@@ -67,12 +67,18 @@ export default function LeaguesPage() {
         setError('');
         try {
             const publicData = await leaguesApi.getPublic();
-            setLeagues(publicData);
-
+            
             // Also fetch user's leagues if we have the backend user ID
             if (backendUserId) {
                 const myData = await leaguesApi.getJoinedLeagues(backendUserId);
                 setMyLeagues(myData);
+                
+                // Filter public leagues to exclude ones user is already in
+                const myLeagueIds = new Set(myData.map((l: League) => l.id));
+                const availablePublic = publicData.filter((l: League) => !myLeagueIds.has(l.id));
+                setLeagues(availablePublic);
+            } else {
+                setLeagues(publicData);
             }
         } catch (err: any) {
             setError(err.message || 'Failed to load leagues');
@@ -198,7 +204,7 @@ export default function LeaguesPage() {
                                 : 'bg-white/10 text-green-200 hover:bg-white/20'
                             }`}
                     >
-                        Public Leagues ({leagues.length})
+                        Join Public Leagues ({leagues.length})
                     </button>
                 </div>
 

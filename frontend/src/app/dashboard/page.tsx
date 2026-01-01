@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState('');
   const [backendUserId, setBackendUserId] = useState<number | null>(null);
+  const [userStats, setUserStats] = useState({ totalPoints: 0, activeLeagues: 0, bestRank: 0, playersDrafted: 0 });
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -51,8 +52,15 @@ export default function DashboardPage() {
         }
 
         setBackendUserId(profile.id);
-        const joinedLeagues = await leaguesApi.getJoinedLeagues(profile.id);
+        
+        // Fetch leagues and stats
+        const [joinedLeagues, stats] = await Promise.all([
+          leaguesApi.getJoinedLeagues(profile.id),
+          authApi.getStats(profile.id)
+        ]);
+        
         setLeagues(joinedLeagues);
+        setUserStats(stats);
       } catch (err) {
         console.error('Dashboard load error:', err);
         setError('Failed to load leagues or user profile');
@@ -159,19 +167,19 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-6 text-white">
             <p className="text-green-100 text-sm mb-1">Total Points</p>
-            <p className="text-3xl font-bold">254</p>
+            <p className="text-3xl font-bold">{userStats.totalPoints}</p>
           </div>
           <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 text-white">
             <p className="text-blue-100 text-sm mb-1">Active Leagues</p>
-            <p className="text-3xl font-bold">2</p>
+            <p className="text-3xl font-bold">{userStats.activeLeagues}</p>
           </div>
           <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 text-white">
             <p className="text-purple-100 text-sm mb-1">Best Rank</p>
-            <p className="text-3xl font-bold">#2</p>
+            <p className="text-3xl font-bold">{userStats.bestRank > 0 ? `#${userStats.bestRank}` : '-'}</p>
           </div>
           <div className="bg-gradient-to-br from-yellow-600 to-yellow-700 rounded-xl p-6 text-white">
             <p className="text-yellow-100 text-sm mb-1">Players Drafted</p>
-            <p className="text-3xl font-bold">12</p>
+            <p className="text-3xl font-bold">{userStats.playersDrafted}</p>
           </div>
         </div>
 

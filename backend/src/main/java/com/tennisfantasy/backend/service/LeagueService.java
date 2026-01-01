@@ -5,6 +5,7 @@ import com.tennisfantasy.backend.model.LeagueMember;
 import com.tennisfantasy.backend.model.User;
 import com.tennisfantasy.backend.repository.LeagueMemberRepository;
 import com.tennisfantasy.backend.repository.LeagueRepository;
+import com.tennisfantasy.backend.repository.RosterRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +22,12 @@ public class LeagueService {
 
     private final LeagueRepository leagueRepository;
     private final LeagueMemberRepository leagueMemberRepository;
+    private final RosterRepository rosterRepository;
 
-    public LeagueService(LeagueRepository leagueRepository, LeagueMemberRepository leagueMemberRepository) {
+    public LeagueService(LeagueRepository leagueRepository, LeagueMemberRepository leagueMemberRepository, RosterRepository rosterRepository) {
         this.leagueRepository = leagueRepository;
         this.leagueMemberRepository = leagueMemberRepository;
+        this.rosterRepository = rosterRepository;
     }
 
     /**
@@ -107,16 +110,13 @@ public class LeagueService {
 
     /**
      * Leave a league.
+     * If commissioner leaves and there are other members, ownership transfers automatically.
+     * If commissioner is the only member, the league is deleted.
      */
     @Transactional
     public void leaveLeague(Long leagueId, Long userId) {
         LeagueMember member = leagueMemberRepository.findByLeagueIdAndUserId(leagueId, userId)
                 .orElseThrow(() -> new RuntimeException("Membership not found"));
-
-        // Cannot leave if commissioner (must transfer ownership first)
-        if (member.getIsCommissioner()) {
-            throw new RuntimeException("Commissioner cannot leave. Transfer ownership first.");
-        }
 
         League league = member.getLeague();
 
@@ -124,6 +124,33 @@ public class LeagueService {
         if (!"NOT_STARTED".equals(league.getDraftStatus())) {
             throw new RuntimeException("Cannot leave - draft has already started");
         }
+
+        // If commissioner is leaving, handle ownership transfer or deletion
+        if (member.getIsCommissioner()) {
+            List<LeagueMember> allMembers = leagueMemberRepository.findByLeagueId(leagueId);
+            
+            if (allMembers.size() <= 1) {
+                // Commissioner is the only member - delete rosters, member, then league
+                rosterRepository.deleteAll(rosterRepository.findByLeagueMemberId(member.getId()));
+                leagueMemberRepository.delete(member);
+                leagueRepository.delete(league);
+                return;
+            } else {
+                // Transfer ownership to another member
+                LeagueMember newCommissioner = allMembers.stream()
+                        .filter(m -> !m.getId().equals(member.getId()))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("No other members to transfer ownership to"));
+                
+                newCommissioner.setIsCommissioner(true);
+                league.setOwner(newCommissioner.getUser());
+                leagueMemberRepository.save(newCommissioner);
+                leagueRepository.save(league);
+            }
+        }
+
+        // Delete member's rosters first (to avoid foreign key constraint)
+        rosterRepository.deleteAll(rosterRepository.findByLeagueMemberId(member.getId()));
 
         // Remove member
         leagueMemberRepository.delete(member);
@@ -190,10 +217,10 @@ public class LeagueService {
     }
 
     /**
-     * Get public leagues that can be joined.
+     * Get public leagues that can be joined (active and have room).
      */
     public List<League> getPublicLeagues() {
-        return leagueRepository.findByIsPublicTrue();
+        return leagueRepository.findJoinablePublicLeagues();
     }
 
     /**

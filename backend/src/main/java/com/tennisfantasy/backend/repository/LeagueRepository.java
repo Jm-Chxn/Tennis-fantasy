@@ -24,6 +24,10 @@ public interface LeagueRepository extends JpaRepository<League, Long> {
     // Find all public leagues
     List<League> findByIsPublicTrue();
 
+    // Find public leagues that can be joined (public, active, and have room)
+    @Query("SELECT l FROM League l WHERE l.isPublic = true AND l.status = 'ACTIVE' AND l.currentTeams < l.maxTeams")
+    List<League> findJoinablePublicLeagues();
+
     // Find active leagues
     List<League> findByStatus(String status);
 

@@ -155,6 +155,7 @@ export const authApi = {
     getProfile: (supabaseId: string) => fetchApi(`/auth/profile?supabaseId=${supabaseId}`),
     updateProfile: (data: { supabaseId: string; displayName?: string; avatarUrl?: string }) =>
         fetchApi('/auth/profile', { method: 'PUT', body: JSON.stringify(data) }),
+    getStats: (userId: number) => fetchApi<{ totalPoints: number; activeLeagues: number; bestRank: number; playersDrafted: number }>(`/auth/stats/${userId}`),
 };
 
 // SportsRadar data
