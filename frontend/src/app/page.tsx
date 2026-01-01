@@ -1,6 +1,11 @@
+'use client';
+
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
+  const { user, loading } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-green-800 to-emerald-900">
       {/* Hero Section */}
@@ -30,12 +35,25 @@ export default function Home() {
             >
               Leaderboard
             </Link>
-            <Link
-              href="/login"
-              className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
-            >
-              Sign In
-            </Link>
+            {loading ? (
+              <div className="px-6 py-2 bg-white/10 text-white rounded-full">
+                ...
+              </div>
+            ) : user ? (
+              <Link
+                href="/dashboard"
+                className="px-6 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-green-900 font-bold rounded-full hover:from-yellow-300 hover:to-yellow-400 transition-all"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         </nav>
 
@@ -53,10 +71,10 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/login"
+              href={user ? "/dashboard" : "/login"}
               className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-green-900 font-bold text-lg rounded-full hover:from-yellow-300 hover:to-yellow-400 transition-all transform hover:scale-105 shadow-xl"
             >
-              Start Playing Free
+              {user ? "Go to Dashboard" : "Start Playing Free"}
             </Link>
             <Link
               href="/players"
@@ -145,10 +163,10 @@ export default function Home() {
             Join thousands of tennis fans competing in fantasy leagues
           </p>
           <Link
-            href="/login"
+            href={user ? "/dashboard" : "/login"}
             className="inline-block px-10 py-4 bg-white text-green-700 font-bold text-lg rounded-full hover:bg-green-50 transition-colors shadow-xl"
           >
-            Create Free Account
+            {user ? "Go to Dashboard" : "Create Free Account"}
           </Link>
         </div>
       </div>
