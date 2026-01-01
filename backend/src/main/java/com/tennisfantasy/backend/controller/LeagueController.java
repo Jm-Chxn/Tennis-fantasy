@@ -5,6 +5,9 @@ import com.tennisfantasy.backend.model.LeagueMember;
 import com.tennisfantasy.backend.model.User;
 import com.tennisfantasy.backend.repository.UserRepository;
 import com.tennisfantasy.backend.service.LeagueService;
+import com.tennisfantasy.backend.dto.LeagueCreateRequest;
+import com.tennisfantasy.backend.dto.LeagueJoinRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,40 +74,25 @@ public class LeagueController {
      * Create a new league.
      * 
      * POST /api/leagues
-     * Body: { "name": "...", "userId": 1, "teamName": "..." }
      */
     @PostMapping
-    public ResponseEntity<?> createLeague(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> createLeague(@Valid @RequestBody LeagueCreateRequest request) {
         try {
-            String name = (String) request.get("name");
-            Long userId = ((Number) request.get("userId")).longValue();
-            String teamName = (String) request.get("teamName");
-
-            User owner = userRepository.findById(userId)
+            User owner = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             League league = new League();
-            league.setName(name);
-            league.setDescription((String) request.getOrDefault("description", ""));
+            league.setName(request.getName());
+            league.setDescription(request.getDescription() != null ? request.getDescription() : "");
+            league.setMaxTeams(request.getMaxTeams());
+            league.setRosterSize(request.getRosterSize());
+            league.setStarterSize(request.getStarterSize());
+            league.setTourType(request.getTourType());
+            league.setIsPublic(request.getIsPublic());
 
-            if (request.containsKey("maxTeams")) {
-                league.setMaxTeams(((Number) request.get("maxTeams")).intValue());
-            }
-            if (request.containsKey("rosterSize")) {
-                league.setRosterSize(((Number) request.get("rosterSize")).intValue());
-            }
-            if (request.containsKey("starterSize")) {
-                league.setStarterSize(((Number) request.get("starterSize")).intValue());
-            }
-            if (request.containsKey("tourType")) {
-                league.setTourType((String) request.get("tourType"));
-            }
-            if (request.containsKey("isPublic")) {
-                league.setIsPublic((Boolean) request.get("isPublic"));
-            }
-
-            logger.info(">>> POST /api/leagues - Creating league: {} for user ID: {}", name, userId);
-            League createdLeague = leagueService.createLeague(league, owner, teamName);
+            logger.info(">>> POST /api/leagues - Creating league: {} for user ID: {}", request.getName(),
+                    request.getUserId());
+            League createdLeague = leagueService.createLeague(league, owner, request.getTeamName());
             logger.info(">>> POST /api/leagues - Created league: {} (ID: {}) for owner: {}", createdLeague.getName(),
                     createdLeague.getId(),
                     owner.getDisplayName());
@@ -122,19 +110,14 @@ public class LeagueController {
      * Join a league using join code.
      * 
      * POST /api/leagues/join
-     * Body: { "joinCode": "ABC123", "userId": 1, "teamName": "..." }
      */
     @PostMapping("/join")
-    public ResponseEntity<?> joinLeague(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> joinLeague(@Valid @RequestBody LeagueJoinRequest request) {
         try {
-            String joinCode = (String) request.get("joinCode");
-            Long userId = ((Number) request.get("userId")).longValue();
-            String teamName = (String) request.get("teamName");
-
-            User user = userRepository.findById(userId)
+            User user = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            LeagueMember member = leagueService.joinLeague(joinCode, user, teamName);
+            LeagueMember member = leagueService.joinLeague(request.getJoinCode(), user, request.getTeamName());
             return ResponseEntity.ok(member);
 
         } catch (Exception e) {

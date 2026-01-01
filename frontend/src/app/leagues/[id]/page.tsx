@@ -76,9 +76,9 @@ export default function LeagueDetailPage() {
         const member = membersData.find(m => m.user?.id === backendUserId);
         setIsMember(!!member);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching league:', err);
-      setError('Failed to load league data');
+      setError('Failed to load league data: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }

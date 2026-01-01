@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,14 +33,18 @@ import java.util.List;
  * - Draft operations
  * - Roster management
  */
+import com.tennisfantasy.backend.filter.RateLimitingFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final RateLimitingFilter rateLimitingFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, RateLimitingFilter rateLimitingFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.rateLimitingFilter = rateLimitingFilter;
     }
 
     @Bean
@@ -69,8 +74,11 @@ public class SecurityConfig {
                         // All other requests require authentication
                         .anyRequest().authenticated())
 
-                // Add JWT filter before username/password filter
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                // Add Rate Limiting filter
+                .addFilterBefore(rateLimitingFilter, AuthorizationFilter.class)
+
+                // Add JWT filter
+                .addFilterBefore(jwtAuthFilter, AuthorizationFilter.class)
 
                 // Allow H2 console frames
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
