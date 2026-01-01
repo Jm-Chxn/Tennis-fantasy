@@ -161,16 +161,6 @@ public class LeagueController {
     }
 
     /**
-     * Get league standings.
-     * 
-     * GET /api/leagues/{id}/standings
-     */
-    @GetMapping("/{id}/standings")
-    public ResponseEntity<List<LeagueMember>> getLeagueStandings(@PathVariable Long id) {
-        return ResponseEntity.ok(leagueService.getLeagueStandings(id));
-    }
-
-    /**
      * Update league settings.
      * 
      * PUT /api/leagues/{id}

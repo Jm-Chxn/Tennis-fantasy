@@ -70,6 +70,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/sportradar/sync").permitAll()
                         .requestMatchers(HttpMethod.POST, "/players/init-sample-data").permitAll()
                         .requestMatchers(HttpMethod.GET, "/leagues/public").permitAll()
+                        // Allow viewing league details, members, and standings without auth
+                        .requestMatchers(HttpMethod.GET, "/leagues/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/leagues/{id}/members").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/leagues/{id}/standings").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/leagues/user/{userId}").permitAll()
 
                         // All other requests require authentication
                         .anyRequest().authenticated())

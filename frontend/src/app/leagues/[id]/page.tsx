@@ -117,10 +117,12 @@ export default function LeagueDetailPage() {
     try {
       await leaguesApi.leave(leagueId, backendUserId);
       alert('Successfully left the league');
-      router.push('/dashboard');
+      router.push('/leagues');
     } catch (err: any) {
       console.error('Error leaving league:', err);
-      alert(err.message || 'Failed to leave league');
+      // Show the actual error message from the backend
+      const errorMessage = err.message || 'Failed to leave league';
+      alert('Error: ' + errorMessage);
     }
   };
 
