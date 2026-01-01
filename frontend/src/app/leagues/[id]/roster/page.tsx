@@ -46,13 +46,23 @@ export default function RosterPage() {
           const profile = await authApi.getProfile(user.id) as { id: number };
           setBackendUserId(profile.id);
         } catch (err) {
-          console.error('Failed to fetch user profile', err);
+          console.log('User not found in backend, registering...', user.id);
+          try {
+            await authApi.register({
+              supabaseId: user.id,
+              email: user.email || '',
+              displayName: user.displayName || 'New Player'
+            });
+            const profile = await authApi.getProfile(user.id) as { id: number };
+            setBackendUserId(profile.id);
+          } catch (regErr) {
+            console.error('Failed to sync user profile', regErr);
+          }
         }
       }
     };
     fetchBackendUser();
   }, [user]);
-
   // Use backendUserId instead of 1
   const userId = backendUserId;
 
@@ -124,7 +134,13 @@ export default function RosterPage() {
           [...bench, playerId]
         );
       } else {
-        // Move to starters
+        // Move to starters - CHECK LIMIT FIRST
+        const maxStarters = league?.starterSize || 5;
+        if (starters.length >= maxStarters) {
+          alert(`You can only have ${maxStarters} starters. Bench someone first.`);
+          return;
+        }
+
         await rosterApi.updateLineup(
           leagueId,
           userId,
@@ -217,12 +233,14 @@ export default function RosterPage() {
           <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 border border-white/10">
             <p className="text-green-200 text-sm">Roster Size</p>
             <p className="text-2xl font-bold text-white">
-              {budgetInfo?.currentRosterSize || 0}/{budgetInfo?.maxRosterSize || 6}
+              {budgetInfo?.currentRosterSize || 0}/{league?.rosterSize || 8}
             </p>
           </div>
           <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 border border-white/10">
             <p className="text-green-200 text-sm">Starters</p>
-            <p className="text-2xl font-bold text-green-400">{starters.length}</p>
+            <p className="text-2xl font-bold text-green-400">
+              {starters.length}/{league?.starterSize || 5}
+            </p>
           </div>
           <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 border border-white/10">
             <p className="text-green-200 text-sm">Bench</p>

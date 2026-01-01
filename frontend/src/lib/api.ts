@@ -57,6 +57,7 @@ export interface League {
     maxTeams: number;
     currentTeams: number;
     rosterSize: number;
+    starterSize: number;
     draftType: string;
     draftStatus: string;
     tourType: string;
@@ -71,6 +72,10 @@ export interface LeagueMember {
     leagueRank: number;
     wins: number;
     losses: number;
+    user: {
+        id: number;
+        displayName: string;
+    };
 }
 
 // API Functions
@@ -95,6 +100,9 @@ export const leaguesApi = {
         fetchApi<LeagueMember>('/leagues/join', { method: 'POST', body: JSON.stringify(data) }),
     getMembers: (leagueId: number) => fetchApi<LeagueMember[]>(`/leagues/${leagueId}/members`),
     getStandings: (leagueId: number) => fetchApi<LeagueMember[]>(`/leagues/${leagueId}/standings`),
+    getJoinedLeagues: (userId: number) => fetchApi<League[]>(`/leagues/user/${userId}`),
+    leave: (leagueId: number, userId: number) =>
+        fetchApi(`/leagues/${leagueId}/leave`, { method: 'POST', body: JSON.stringify({ userId }) }),
 };
 
 // Draft

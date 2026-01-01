@@ -38,10 +38,21 @@ export default function PlayersPage() {
     const fetchBackendUser = async () => {
       if (user?.id) {
         try {
-          const profile = await authApi.getProfile(user.id);
+          const profile = await authApi.getProfile(user.id) as { id: number };
           setBackendUserId(profile.id);
         } catch (err) {
-          console.error('Failed to fetch user profile', err);
+          console.log('User not found in backend, registering...', user.id);
+          try {
+            await authApi.register({
+              supabaseId: user.id,
+              email: user.email || '',
+              displayName: user.displayName || 'New Player'
+            });
+            const profile = await authApi.getProfile(user.id) as { id: number };
+            setBackendUserId(profile.id);
+          } catch (regErr) {
+            console.error('Failed to sync user profile', regErr);
+          }
         }
       }
     };
@@ -58,7 +69,7 @@ export default function PlayersPage() {
 
   // Fetch league data if leagueId is provided
   const fetchLeagueData = useCallback(async () => {
-    if (!leagueId) return;
+    if (!leagueId || userId === null) return;
 
     try {
       const [leagueData, budgetData, rosterData] = await Promise.all([

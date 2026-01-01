@@ -80,6 +80,14 @@ public class RosterController {
             var member = leagueMemberRepository.findByLeagueIdAndUserId(leagueId, userId)
                     .orElseThrow(() -> new RuntimeException("Membership not found"));
 
+            // Validate starter count
+            int newStartersCount = starterIds.size();
+            int maxStarters = member.getLeague().getStarterSize() != null ? member.getLeague().getStarterSize() : 5;
+
+            if (newStartersCount > maxStarters) {
+                throw new RuntimeException("Too many starters. Maximum allowed is " + maxStarters);
+            }
+
             // Update starters
             for (Number starterIdNum : starterIds) {
                 Long playerId = starterIdNum.longValue();
@@ -201,9 +209,9 @@ public class RosterController {
             Roster roster = rosterRepository.findByLeagueMemberIdAndPlayerId(member.getId(), playerId)
                     .orElseThrow(() -> new RuntimeException("Player not on your roster"));
 
-            // Refund 50% of player price
+            // Refund 100% of player price (Fairer Price)
             Player player = roster.getPlayer();
-            double refund = (player.getPrice() != null ? player.getPrice().doubleValue() : 0.0) * 0.5;
+            double refund = (player.getPrice() != null ? player.getPrice().doubleValue() : 0.0);
             member.setBudget(member.getBudget() + refund);
             leagueMemberRepository.save(member);
 

@@ -93,6 +93,9 @@ public class LeagueController {
             if (request.containsKey("rosterSize")) {
                 league.setRosterSize(((Number) request.get("rosterSize")).intValue());
             }
+            if (request.containsKey("starterSize")) {
+                league.setStarterSize(((Number) request.get("starterSize")).intValue());
+            }
             if (request.containsKey("tourType")) {
                 league.setTourType((String) request.get("tourType"));
             }
@@ -220,5 +223,19 @@ public class LeagueController {
     @GetMapping("/search")
     public ResponseEntity<List<League>> searchLeagues(@RequestParam String name) {
         return ResponseEntity.ok(leagueService.searchLeagues(name));
+    }
+
+    /**
+     * Get all leagues a user has joined.
+     * 
+     * GET /api/leagues/user/{userId}
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<League>> getJoinedLeagues(@PathVariable Long userId) {
+        List<LeagueMember> memberships = leagueService.getUserMemberships(userId);
+        List<League> leagues = memberships.stream()
+                .map(LeagueMember::getLeague)
+                .toList();
+        return ResponseEntity.ok(leagues);
     }
 }

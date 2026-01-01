@@ -172,6 +172,7 @@ public class LeagueService {
         league.setDescription(leagueDetails.getDescription());
         league.setMaxTeams(leagueDetails.getMaxTeams());
         league.setRosterSize(leagueDetails.getRosterSize());
+        league.setStarterSize(leagueDetails.getStarterSize());
         league.setDraftType(leagueDetails.getDraftType());
         league.setScoringType(leagueDetails.getScoringType());
         league.setTourType(leagueDetails.getTourType());

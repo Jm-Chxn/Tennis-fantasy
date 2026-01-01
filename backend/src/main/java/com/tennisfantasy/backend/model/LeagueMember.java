@@ -1,5 +1,7 @@
 package com.tennisfantasy.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -21,11 +23,13 @@ public class LeagueMember {
     // The league this membership belongs to
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "league_id", nullable = false)
+    @JsonIgnoreProperties({ "owner", "hibernateLazyInitializer", "handler" })
     private League league;
 
     // The user who is a member
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({ "leagues", "hibernateLazyInitializer", "handler" })
     private User user;
 
     // Team name for this league

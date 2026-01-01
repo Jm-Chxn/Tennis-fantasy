@@ -10,10 +10,15 @@ export default function DashboardPage() {
   const { user, signOut, loading } = useAuth();
   const router = useRouter();
   const [showCreateLeague, setShowCreateLeague] = useState(false);
+  const [showJoinLeague, setShowJoinLeague] = useState(false);
   const [leagues, setLeagues] = useState<any[]>([]);
+  const [leaguesLoading, setLeaguesLoading] = useState(true);
   const [leagueName, setLeagueName] = useState('');
   const [teamName, setTeamName] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+  const [joinTeamName, setJoinTeamName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [joining, setJoining] = useState(false);
   const [error, setError] = useState('');
   const [backendUserId, setBackendUserId] = useState<number | null>(null);
 
@@ -27,20 +32,37 @@ export default function DashboardPage() {
   // Fetch user's backend profile and leagues
   useEffect(() => {
     const fetchProfileAndLeagues = async () => {
+      setLeaguesLoading(true);
       try {
         if (!user) return;
-        // Get backend user profile by supabaseId
-        const profile = await authApi.getProfile(user.id);
+
+        let profile;
+        try {
+          profile = await authApi.getProfile(user.id) as { id: number };
+        } catch (err: any) {
+          // If user doesn't exist in backend, register them now
+          console.log('User not found in backend, registering...', user.id);
+          await authApi.register({
+            supabaseId: user.id,
+            email: user.email || '',
+            displayName: user.displayName || 'New Player'
+          });
+          profile = await authApi.getProfile(user.id) as { id: number };
+        }
+
         setBackendUserId(profile.id);
-        const allLeagues = await leaguesApi.getAll();
-        setLeagues(allLeagues);
+        const joinedLeagues = await leaguesApi.getJoinedLeagues(profile.id);
+        setLeagues(joinedLeagues);
       } catch (err) {
+        console.error('Dashboard load error:', err);
         setError('Failed to load leagues or user profile');
         setLeagues([]);
+      } finally {
+        setLeaguesLoading(false);
       }
     };
     fetchProfileAndLeagues();
-  }, [user, creating]);
+  }, [user, creating, joining]);
 
   const handleCreateLeague = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,6 +81,26 @@ export default function DashboardPage() {
       setError(err.message || 'Failed to create league');
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleJoinLeague = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!joinCode || !joinTeamName || !backendUserId) {
+      setError('Missing required info.');
+      return;
+    }
+    setJoining(true);
+    setError('');
+    try {
+      await leaguesApi.join({ joinCode, userId: backendUserId, teamName: joinTeamName });
+      setShowJoinLeague(false);
+      setJoinCode('');
+      setJoinTeamName('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to join league');
+    } finally {
+      setJoining(false);
     }
   };
 
@@ -89,6 +131,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-6">
             <nav className="flex gap-4">
+              <Link href="/leagues" className="text-green-200 hover:text-white transition-colors">Leagues</Link>
               <Link href="/players" className="text-green-200 hover:text-white transition-colors">Players</Link>
               <Link href="/leaderboard" className="text-green-200 hover:text-white transition-colors">Leaderboard</Link>
             </nav>
@@ -137,16 +180,29 @@ export default function DashboardPage() {
           <div className="lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-white">My Leagues</h2>
-              <button
-                onClick={() => setShowCreateLeague(true)}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-              >
-                + Create League
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowJoinLeague(true)}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                >
+                  🔗 Join League
+                </button>
+                <button
+                  onClick={() => setShowCreateLeague(true)}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                >
+                  + Create League
+                </button>
+              </div>
             </div>
 
             <div className="space-y-4">
-              {leagues.length > 0 ? leagues.map((league) => (
+              {leaguesLoading ? (
+                <div className="bg-white/5 rounded-xl p-8 text-center border border-white/10">
+                  <div className="text-4xl mb-2 animate-bounce">🎾</div>
+                  <p className="text-green-200">Loading your leagues...</p>
+                </div>
+              ) : leagues.length > 0 ? leagues.map((league) => (
                 <div
                   key={league.id}
                   className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 hover:border-green-500/50 transition-all"
@@ -154,7 +210,15 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-xl font-bold text-white mb-1">{league.name}</h3>
-                      <p className="text-green-200 text-sm">{league.currentTeams || 1}/{league.maxTeams} teams</p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-green-200">{league.currentTeams || 1}/{league.maxTeams} teams</span>
+                        <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-xs">
+                          {league.tourType || 'ATP/WTA'}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded text-xs ${league.status === 'ACTIVE' ? 'bg-green-500/20 text-green-300' : 'bg-yellow-500/20 text-yellow-300'}`}>
+                          {league.status || 'ACTIVE'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div className="mt-4 flex gap-2">
@@ -175,9 +239,20 @@ export default function DashboardPage() {
               )) : (
                 <div className="bg-white/5 rounded-xl p-8 text-center border border-dashed border-white/20">
                   <p className="text-green-200 mb-4">You haven&apos;t joined any leagues yet</p>
-                  <button className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
-                    Browse Public Leagues
-                  </button>
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => setShowJoinLeague(true)}
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    >
+                      Join with Code
+                    </button>
+                    <Link
+                      href="/leagues"
+                      className="inline-block px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                    >
+                      Browse Public Leagues
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
@@ -271,6 +346,58 @@ export default function DashboardPage() {
                   disabled={creating}
                 >
                   {creating ? 'Creating...' : 'Create'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Join League Modal */}
+      {showJoinLeague && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-800 rounded-2xl p-8 w-full max-w-md border border-white/10">
+            <h2 className="text-2xl font-bold text-white mb-6">Join a League</h2>
+            <form className="space-y-4" onSubmit={handleJoinLeague}>
+              <div>
+                <label className="block text-green-100 text-sm font-medium mb-2">Invite Code</label>
+                <input
+                  type="text"
+                  value={joinCode}
+                  onChange={e => setJoinCode(e.target.value.toUpperCase())}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 uppercase tracking-widest text-center text-lg font-mono"
+                  placeholder="ABC123"
+                  maxLength={6}
+                  required
+                />
+                <p className="text-green-200/60 text-xs mt-1">Enter the 6-character code shared by the league owner</p>
+              </div>
+              <div>
+                <label className="block text-green-100 text-sm font-medium mb-2">Your Team Name</label>
+                <input
+                  type="text"
+                  value={joinTeamName}
+                  onChange={e => setJoinTeamName(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="The Aces"
+                  required
+                />
+              </div>
+              {error && <div className="text-red-400 text-sm">{error}</div>}
+              <div className="flex gap-4 mt-6">
+                <button
+                  type="button"
+                  onClick={() => { setShowJoinLeague(false); setError(''); }}
+                  className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  disabled={joining}
+                >
+                  {joining ? 'Joining...' : 'Join League'}
                 </button>
               </div>
             </form>

@@ -1,5 +1,7 @@
 package com.tennisfantasy.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +31,7 @@ public class League {
     // League owner/creator
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id")
+    @JsonIgnoreProperties({ "leagues", "hibernateLazyInitializer", "handler" })
     private User owner;
 
     // League join code for invites
@@ -44,9 +47,13 @@ public class League {
     @Column(name = "current_teams")
     private Integer currentTeams = 0;
 
-    // Roster size per team
+    // Roster size per team (Total players allowed)
     @Column(name = "roster_size")
-    private Integer rosterSize = 6;
+    private Integer rosterSize = 8;
+
+    // Starter size per team (Active players who earn points)
+    @Column(name = "starter_size")
+    private Integer starterSize = 5;
 
     // Draft type: "SNAKE", "LINEAR", "AUCTION"
     @Column(name = "draft_type")
@@ -167,6 +174,14 @@ public class League {
 
     public void setRosterSize(Integer rosterSize) {
         this.rosterSize = rosterSize;
+    }
+
+    public Integer getStarterSize() {
+        return starterSize;
+    }
+
+    public void setStarterSize(Integer starterSize) {
+        this.starterSize = starterSize;
     }
 
     public String getDraftType() {
